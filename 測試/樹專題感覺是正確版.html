@@ -1,0 +1,2916 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>路樹殺人，是天災還是人禍？</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;600;700;900&family=Noto+Sans+TC:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+
+<style>
+/* ═══════════════════════════════════════════
+   RESET & TOKENS
+═══════════════════════════════════════════ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+em{font-style:normal}
+:root{
+  --cream:#F5F0E8; --dark:#1A1A14; --darker:#0e0e09; --paper:#F0EBE0;
+  --red:#C0392B; --red-dim:rgba(192,57,43,0.6); --red-glow:rgba(192,57,43,0.15);
+  --gold:#C9A84C; --gold-dim:rgba(201,168,76,0.35); --gold-glow:rgba(201,168,76,0.08);
+  --brown:#8B4513;
+  --text:rgba(245,240,232,0.88); --text-mid:rgba(245,240,232,0.58); --text-dim:rgba(245,240,232,0.32);
+  --border:rgba(245,240,232,0.08); --border-gold:rgba(201,168,76,0.2);
+  --serif:'Noto Serif TC',serif; --sans:'Noto Sans TC',sans-serif;
+}
+html{scroll-behavior:smooth;background:var(--darker)}
+body{background:var(--darker);color:var(--cream);font-family:var(--sans);font-weight:300;overflow-x:hidden;line-height:1.9}
+
+/* Flourish embed sizing */
+.flourish-embed iframe{border:none!important;display:block;}
+/* Map section: Flourish iframe fills sticky container */
+#map-section .flourish-embed{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;margin:0!important;background:#080a08!important;}
+#map-section .flourish-embed iframe{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;background:#080a08!important;}
+
+/* grain */
+body::after{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");opacity:.022;pointer-events:none;z-index:9000}
+
+/* progress */
+#pbar{position:fixed;top:0;left:0;height:2px;background:var(--gold);width:0%;z-index:8000;transition:width .1s linear}
+
+/* ═══════════════════════════════════════════
+   NAV
+═══════════════════════════════════════════ */
+#top-nav{position:fixed;top:0;left:0;right:0;z-index:500;background:rgba(14,14,9,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border-gold);display:none}
+.nav-inner{display:flex;align-items:center;max-width:1100px;margin:0 auto;padding:0 32px}
+.nav-logo{font-family:var(--serif);font-size:13px;font-weight:700;color:var(--gold);padding:14px 0;margin-right:auto;letter-spacing:.04em}
+.part-btn{padding:14px 24px;font-family:var(--serif);font-size:13px;font-weight:600;color:var(--text-mid);background:none;border:none;cursor:pointer;transition:color .2s;border-bottom:2px solid transparent;letter-spacing:.04em}
+.part-btn:hover{color:var(--text)}
+.part-btn.active{color:var(--gold);border-bottom-color:var(--gold)}
+.part-btn .part-sub{font-size:9px;letter-spacing:.25em;color:var(--text-dim);display:block;margin-bottom:2px;font-family:var(--sans);font-weight:300}
+.part-btn.active .part-sub{color:rgba(201,168,76,.5)}
+
+/* ═══════════════════════════════════════════
+   PARTS
+═══════════════════════════════════════════ */
+.part{display:none}
+.part.active{display:block}
+
+/* ═══════════════════════════════════════════
+   HERO
+═══════════════════════════════════════════ */
+#hero{position:relative;height:calc(var(--vh,1vh)*100);display:flex;align-items:center;justify-content:center;overflow:hidden;background:#060604}
+#hero video{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:100%;height:100%;min-width:100%;min-height:100%;object-fit:cover;opacity:.62;filter:saturate(1.1) brightness(.72)}
+.hero-ov{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(14,14,9,.4) 0%,rgba(14,14,9,.5) 50%,rgba(14,14,9,.97) 100%)}
+.hero-c{position:relative;z-index:2;text-align:center;padding:0 2rem;max-width:880px;}
+.tw-cursor{display:inline-block;width:3px;height:.8em;background:var(--cream);margin-left:2px;vertical-align:middle;animation:twBlink .65s ease-in-out infinite}
+@keyframes twBlink{0%,100%{opacity:1}50%{opacity:0}}
+/* hero-start pulse rings */
+.hs-ring{position:absolute;border-radius:50%;border:1px solid rgba(201,168,76,.5);display:flex;align-items:center;justify-content:center;}
+.hs-ring-1{width:60px;height:60px;border-color:rgba(201,168,76,.85);position:relative;}
+.hs-ring-2{width:96px;height:96px;animation:hsPulse 2.4s ease-in-out infinite;}
+.hs-ring-3{width:136px;height:136px;animation:hsPulse 2.4s ease-in-out infinite .6s;}
+@keyframes hsPulse{0%,100%{transform:scale(1);opacity:.45}50%{transform:scale(1.06);opacity:.9}}
+.hero-tag{display:inline-block;border:1px solid var(--gold);color:var(--gold);font-size:10px;letter-spacing:.35em;padding:5px 16px;margin-bottom:2rem;font-weight:400}
+.hero-h1{font-family:var(--serif);font-weight:900;font-size:clamp(2.2rem,5.5vw,5.6rem);line-height:1.15;color:var(--cream);margin-bottom:1.5rem;letter-spacing:-.01em}
+.hero-h1 em{color:var(--red);font-style:normal}
+.hero-sub{font-size:clamp(.95rem,1.8vw,1.15rem);font-weight:300;color:rgba(245,240,232,.65);line-height:2;max-width:580px;margin:0 auto 1rem}
+.hero-meta{font-size:10px;letter-spacing:.2em;color:var(--text-dim);margin-bottom:0}
+.hero-choose{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-top:3rem;opacity:0;transform:translateY(16px);transition:opacity .9s ease,transform .9s ease;pointer-events:none}
+.hero-choose.revealed{opacity:1;transform:translateY(0);pointer-events:auto}
+.choose-btn{font-family:var(--serif);font-size:15px;font-weight:700;letter-spacing:.05em;padding:1rem 2.8rem;border:1px solid rgba(201,168,76,.5);background:rgba(14,14,9,.5);color:var(--gold);cursor:pointer;transition:all .25s;min-width:180px;text-align:center;backdrop-filter:blur(6px)}
+.choose-btn:hover{border-color:var(--gold);background:var(--gold-glow);transform:translateY(-2px)}
+.choose-btn .btn-sub{display:block;font-family:var(--sans);font-size:9px;font-weight:400;color:rgba(201,168,76,.5);letter-spacing:.3em;margin-bottom:5px}
+.scroll-hint{position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);z-index:2;display:flex;flex-direction:column;align-items:center;gap:8px;opacity:0;animation:riseIn 1s ease 1.6s forwards}
+.scroll-line{width:1px;height:40px;background:linear-gradient(to bottom,var(--gold),transparent);animation:pulse 2s ease-in-out infinite}
+.scroll-hint span{font-size:13px;letter-spacing:.35em;color:var(--text-dim)}
+
+/* ═══════════════════════════════════════════
+   SECTION SYSTEM
+═══════════════════════════════════════════ */
+
+/* fullbleed scene wrapper */
+.scene{position:relative;min-height:calc(var(--vh,1vh)*100);display:flex;flex-direction:column;justify-content:center;overflow:hidden}
+.scene-dark{background:var(--darker)}
+.scene-mid{background:#141410}
+.scene-accent{background:#0f0f0a}
+
+/* wide content */
+.prose{max-width:760px;margin:0 auto;padding:5vw 2rem}
+.prose-wide{max-width:1000px;margin:0 auto;padding:4vw 2rem}
+
+/* scene top label */
+.scene-label{font-size:9px;letter-spacing:.45em;color:var(--gold);text-transform:uppercase;display:block;margin-bottom:1.5rem;opacity:.8}
+
+/* big chapter intro */
+.chapter-intro{padding:8vw 2rem 5vw;max-width:760px;margin:0 auto}
+.chapter-num{font-size:9px;letter-spacing:.5em;color:var(--gold);display:block;margin-bottom:1.5rem;opacity:.7}
+.chapter-h{font-family:var(--serif);font-size:clamp(2rem,5vw,4rem);font-weight:900;line-height:1.15;color:var(--cream);margin-bottom:1.5rem}
+.chapter-h em{color:var(--red);font-style:normal}
+.chapter-lead{font-family:var(--serif);font-size:clamp(1rem,2vw,1.2rem);font-weight:300;line-height:2.1;color:rgba(245,240,232,.78)}
+
+/* pull quote */
+.pull{border-left:3px solid var(--gold);padding:1rem 2rem;margin:2.5rem 0;background:var(--gold-glow)}
+.pull p{font-family:var(--serif);font-size:clamp(.95rem,1.8vw,1.1rem);font-weight:300;line-height:2;color:rgba(245,240,232,.92);margin-bottom:.6rem}
+.pull cite{font-size:10px;letter-spacing:.12em;color:rgba(201,168,76,.7);font-style:normal;text-transform:uppercase}
+
+/* body text */
+.body-p{font-size:clamp(14px,1.6vw,16px);line-height:2.1;color:rgba(245,240,232,.78);margin-bottom:1.4rem}
+
+/* section header */
+.sec-hd{margin-bottom:2rem}
+.sec-num{font-size:9px;letter-spacing:.45em;color:var(--gold);display:block;margin-bottom:.8rem;opacity:.8}
+.sec-h{font-family:var(--serif);font-size:clamp(1.6rem,3.5vw,2.8rem);font-weight:900;line-height:1.25;color:var(--cream);margin-bottom:.8rem}
+.sec-h em{color:var(--gold);font-style:normal}
+.sec-desc{font-size:14px;color:var(--text-mid);line-height:1.9;max-width:620px}
+
+/* divider */
+.rule{width:48px;height:1px;background:var(--gold);opacity:.3;margin:0 0 3rem}
+
+/* stat callout */
+.stat-callout{display:flex;align-items:baseline;gap:12px;margin:2.5rem 0;padding:2rem 0;border-top:1px solid var(--border-gold);border-bottom:1px solid var(--border-gold)}
+.stat-num{font-family:var(--serif);font-size:clamp(3.5rem,7vw,6.5rem);font-weight:900;color:var(--gold);line-height:1}
+.stat-unit{font-family:var(--serif);font-size:clamp(1rem,2vw,1.6rem);color:rgba(201,168,76,.6)}
+.stat-label{font-size:13px;color:var(--text-mid);max-width:240px;line-height:1.7}
+
+/* chart container */
+.chart-box{background:rgba(245,240,232,.02);border:1px solid var(--border);padding:1.8rem 1.5rem 1.4rem;margin:2rem 0}
+.chart-caption{font-size:11px;color:var(--text-dim);margin-top:1rem;line-height:1.6;letter-spacing:.02em}
+
+/* ═══════════════════════════════════════════
+   STICKY SCROLL SEQUENCE
+═══════════════════════════════════════════ */
+.sticky-seq{position:relative}
+.sticky-canvas{position:sticky;top:0;height:calc(var(--vh,1vh)*100);width:100%;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.scroll-steps{position:relative;z-index:10}
+.scroll-step{min-height:calc(var(--vh,1vh)*100);display:flex;align-items:center;padding:0 5vw}
+#sat-section .scroll-step{justify-content:flex-end}
+/* 第二篇字卡：交替左右，左側留目錄空間 */
+.sc-r{height:calc(var(--vh,1vh)*100);display:flex;align-items:center;justify-content:flex-end;padding:0 5vw}
+.sc-l{height:calc(var(--vh,1vh)*100);display:flex;align-items:center;justify-content:flex-start;padding:0 5vw 0 220px}
+@media(max-width:1180px){.sc-l{padding:0 5vw}}
+.scroll-step:first-child{min-height:40vh}
+.scroll-step:last-child{min-height:120vh}
+.step-card{max-width:500px;background:rgba(8,8,5,.88);border:1px solid var(--border-gold);padding:2.6rem 2.8rem;backdrop-filter:blur(10px);opacity:0;transform:translateY(32px);transition:opacity .6s ease,transform .6s ease}
+.step-card.vis{opacity:1;transform:translateY(0)}
+.step-card .s-num{font-size:9px;letter-spacing:.4em;color:var(--gold);display:block;margin-bottom:.8rem;opacity:.8}
+.step-card h3{font-family:var(--serif);font-size:clamp(1.4rem,2.8vw,2rem);font-weight:700;line-height:1.3;margin-bottom:.9rem;color:var(--cream)}
+.step-card h3 em{color:var(--gold);font-style:normal}
+.step-card p{font-size:15px;line-height:1.95;color:var(--text-mid)}
+.step-card p strong{color:var(--text);font-weight:500}
+.step-card.br-sc{padding:2.8rem 3rem;max-width:600px}
+.step-card.br-sc h3{font-size:clamp(1.6rem,3.2vw,2.4rem)}
+.step-card.br-sc p{font-size:clamp(14px,1.6vw,16px);line-height:2}
+
+/* ═══════════════════════════════════════════
+   SATELLITE COMPARE
+═══════════════════════════════════════════ */
+#sat-bg{position:absolute;inset:0;background:radial-gradient(ellipse 80% 70% at 50% 45%,#0d1a0d 0%,var(--darker) 100%)}
+.sat-frame{width:min(88vw,900px);aspect-ratio:16/9;position:relative;border:1px solid var(--border-gold);overflow:hidden}
+.sat-layer{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;transition:opacity .7s ease}
+.sat-year-label{position:absolute;top:16px;left:20px;font-size:10px;letter-spacing:.3em;color:rgba(255,255,255,.4);font-family:var(--sans)}
+.sat-src{position:absolute;bottom:12px;right:14px;font-size:9px;color:rgba(255,255,255,.22);letter-spacing:.04em}
+.sat-dots{position:absolute;top:16px;right:16px;display:flex;gap:6px}
+.sat-dot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.18);transition:background .3s}
+.sat-dot.on{background:var(--gold)}
+/* satellite img grids */
+.sat-inner{width:100%;height:100%;position:relative;overflow:hidden}
+.sat-inner img{width:100%;height:100%;object-fit:cover;display:block}
+.sat-inner svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+
+/* ═══════════════════════════════════════════
+   MAP STICKY
+═══════════════════════════════════════════ */
+#map-bg{position:absolute;inset:0;background:radial-gradient(ellipse 60% 60% at 50% 50%,#0b160b 0%,var(--darker) 100%)}
+#map-svg-wrap{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+
+/* ═══════════════════════════════════════════
+   TWO TREES SIDE LAYOUT (sec-p1-05)
+═══════════════════════════════════════════ */
+#sec-p1-05{overflow:visible}
+#sec-p1-05 .two-col{display:grid;grid-template-columns:1fr 400px;gap:4rem;align-items:start}
+.photo-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.tree-trigger{height:1px;visibility:hidden}
+#sec-p1-05 .text-sticky{position:sticky;top:20vh;min-height:300px}
+#sec-p1-05 .cards-wrap{position:relative;min-height:300px}
+#sec-p1-05 .side-card{position:absolute;top:0;left:0;right:0;background:rgba(8,8,5,.82);border:1px solid var(--border-gold);padding:2.4rem 2.6rem;backdrop-filter:blur(8px);opacity:0;transform:translateY(18px);transition:opacity .5s ease,transform .5s ease}
+#sec-p1-05 .side-card.vis{opacity:1;transform:translateY(0)}
+#sec-p1-05 .side-card .s-num{font-size:9px;letter-spacing:.4em;color:var(--gold);display:block;margin-bottom:.7rem;opacity:.8}
+#sec-p1-05 .side-card h4{font-family:var(--serif);font-size:1.35rem;font-weight:700;color:var(--cream);margin-bottom:.9rem;line-height:1.35}
+#sec-p1-05 .side-card h4 em{color:var(--gold);font-style:normal}
+#sec-p1-05 .side-card p{font-size:15px;line-height:1.95;color:var(--text-mid)}
+@media(max-width:900px){#sec-p1-05 .two-col{grid-template-columns:1fr}#sec-p1-05 .text-sticky{position:static;min-height:unset}#sec-p1-05 .cards-wrap{min-height:unset}#sec-p1-05 .side-card{position:static;opacity:1;transform:none;margin-bottom:1rem}}
+
+/* ═══════════════════════════════════════════
+   PHOTO GRID
+═══════════════════════════════════════════ */
+.photo-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:2.5rem 0}
+.photo-cell{overflow:hidden}
+.photo-cell img{width:100%;height:auto;display:block;filter:saturate(.85) brightness(.95);transition:filter .4s ease}
+.photo-cell:hover img{filter:saturate(.95) brightness(1)}
+.photo-cap-below{padding:10px 2px 4px;display:flex;flex-direction:column;gap:6px}
+.photo-badge{display:inline-block;font-size:10px;font-weight:500;padding:3px 10px;letter-spacing:.04em;align-self:flex-start}
+.badge-healthy{background:rgba(48,100,48,.85);color:#D4EDDA}
+.badge-sick{background:rgba(192,57,43,.85);color:#FCEBEB}
+.badge-warn{background:rgba(139,69,19,.72);color:#FCEBD8}
+.badge-risk{background:rgba(192,57,43,.5);color:#FCEBEB}
+.photo-cap-title{font-size:13px;color:var(--text-mid);line-height:1.7;display:block}
+.photo-cap-body{font-size:12px;color:var(--text-dim);line-height:1.7;display:block;margin-top:2px}
+
+/* ═══════════════════════════════════════════
+   CHAIN (transmission interactive)
+═══════════════════════════════════════════ */
+.chain-outer{margin:1.5rem 0;border:1px solid var(--border);overflow:hidden}
+.chain-tabs{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--border)}
+.chain-tab{padding:10px 8px;text-align:center;cursor:pointer;border-right:1px solid var(--border);transition:background .18s;position:relative;user-select:none}
+.chain-tab:last-child{border-right:none}
+.chain-tab .ti{font-size:14px;line-height:1;margin-bottom:3px}
+.chain-tab .tt{font-size:10px;color:var(--text-mid);line-height:1.3;transition:color .18s}
+.chain-tab::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--gold);transform:scaleX(0);transform-origin:left;transition:transform .22s}
+.chain-tab:hover{background:var(--gold-glow)}
+.chain-tab.active{background:var(--gold-glow)}
+.chain-tab.active::after{transform:scaleX(1)}
+.chain-tab.active .tt{color:var(--gold)}
+#chain-svg{width:100%;height:auto;display:block}
+.chain-caption{padding:14px 20px 12px;min-height:62px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:14px}
+.chain-cap-step{font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);white-space:nowrap;flex-shrink:0;padding-top:2px}
+.chain-cap-text{font-size:12px;line-height:1.9;color:rgba(245,240,232,.75)}
+.chain-cap-text strong{color:var(--cream);font-weight:600}
+.chain-controls{display:flex;gap:10px;padding:12px 20px;align-items:center}
+.btn-ctrl{background:none;border:1px solid rgba(201,168,76,.45);color:var(--cream);font-size:12px;font-family:var(--sans);padding:7px 0;cursor:pointer;transition:all .2s;letter-spacing:1px;width:90px;text-align:center}
+.btn-ctrl:hover{background:var(--gold-glow);border-color:var(--gold)}
+.btn-ctrl:disabled{opacity:.25;cursor:default}
+.chain-dots{display:flex;gap:5px;margin-left:auto}
+.chain-dot{width:5px;height:5px;border-radius:50%;background:rgba(245,240,232,.1);transition:background .25s}
+.chain-dot.done{background:rgba(245,240,232,.55)}
+.chain-dot.active{background:var(--gold)}
+
+/* ═══════════════════════════════════════════
+   DISEASE BARS
+═══════════════════════════════════════════ */
+.d-row{display:grid;grid-template-columns:110px 1fr 56px;align-items:center;gap:14px;margin-bottom:10px;opacity:0;transform:translateX(-16px);transition:opacity .5s ease,transform .5s ease}
+.d-row.ani{opacity:1;transform:translateX(0)}
+.d-name{font-size:12px;color:var(--text-mid);text-align:right}
+.d-track{height:22px;background:rgba(255,255,255,.04);overflow:hidden}
+.d-fill{height:100%;transform-origin:left;transform:scaleX(0);transition:transform 1.2s cubic-bezier(.16,1,.3,1);display:flex;align-items:center;padding-left:10px}
+.d-fill.ani{transform:scaleX(1)}
+.d-fill-lbl{font-size:10px;font-weight:500;white-space:nowrap;opacity:0;transition:opacity .4s .8s}
+.d-fill.ani .d-fill-lbl{opacity:1}
+.d-val{font-size:12px;color:var(--text-mid);text-align:right}
+
+/* ═══════════════════════════════════════════
+   STATS BAND
+═══════════════════════════════════════════ */
+.stats-band{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--border-gold);border-bottom:1px solid var(--border-gold);max-width:760px;margin:2rem auto}
+.stat-item{text-align:center;padding:2rem 1.5rem;border-right:1px solid var(--border);opacity:0;transform:translateY(16px);transition:all .6s ease}
+.stat-item:last-child{border-right:none}
+.stat-item.vis{opacity:1;transform:translateY(0)}
+.stat-n{font-family:var(--serif);font-size:clamp(2.2rem,4.5vw,3.8rem);font-weight:900;color:var(--red);line-height:1;margin-bottom:.5rem}
+.stat-l{font-size:12px;color:var(--text-mid);line-height:1.6}
+
+/* ═══════════════════════════════════════════
+   COUNTY CHART
+═══════════════════════════════════════════ */
+#crt .crt-title{font-size:15px;font-weight:500;color:var(--cream);margin-bottom:4px}
+#crt .crt-sub{font-size:12px;color:var(--text-mid);margin-bottom:1.5rem;letter-spacing:.03em}
+#crt .crt-chart{display:flex;gap:28px;align-items:flex-end;justify-content:center;padding:0 1rem}
+#crt .crt-col{display:flex;flex-direction:column;align-items:center;gap:8px;flex:1;max-width:140px}
+#crt .crt-bar-wrap{width:100%;display:flex;flex-direction:column;justify-content:flex-end;height:220px}
+#crt .crt-seg{width:100%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:600;cursor:pointer;transition:opacity .15s}
+#crt .crt-seg:hover{opacity:.8}
+#crt .crt-seg.active{outline:2px solid rgba(245,240,232,.7);outline-offset:-2px}
+#crt .crt-no{background:rgba(192,57,43,.75);color:#FCEBEB}
+#crt .crt-yes{background:rgba(74,138,62,.8);color:#D4EDDA}
+#crt .crt-col-label{font-size:11px;color:var(--text-mid);text-align:center;line-height:1.5}
+#crt .crt-legend{display:flex;gap:20px;justify-content:center;margin-top:1rem}
+#crt .crt-leg-item{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-mid)}
+#crt .crt-leg-dot{width:10px;height:10px;border-radius:2px}
+#crt .crt-detail{margin-top:1.25rem;padding:1rem 1.25rem;background:rgba(245,240,232,.03);border:1px solid var(--border);min-height:60px}
+#crt .crt-detail-title{font-size:13px;font-weight:500;color:rgba(245,240,232,.88);margin-bottom:8px}
+#crt .crt-tags{display:flex;flex-wrap:wrap;gap:6px}
+#crt .crt-tag{font-size:12px;padding:3px 10px}
+#crt .crt-tag-yes{background:rgba(48,100,48,.35);color:#7AB87A}
+#crt .crt-tag-no{background:rgba(192,57,43,.2);color:#E07070}
+#crt .crt-hint{font-size:12px;color:var(--text-dim);text-align:center;margin:0}
+#crt .crt-source{font-size:11px;color:var(--text-dim);margin-top:1rem;text-align:right}
+
+/* ═══════════════════════════════════════════
+   PRUNING INTERACTIVE
+═══════════════════════════════════════════ */
+.pg-wrap{background:rgba(245,240,232,.02);border:1px solid var(--border);padding:2rem 1.5rem 1.5rem;margin:1.5rem 0}
+.pg-title{font-size:15px;font-weight:600;color:var(--cream);margin-bottom:.3rem;font-family:var(--serif);text-align:center}
+.pg-sub{font-size:12px;color:var(--text-mid);text-align:center;margin-bottom:1.5rem}
+#pg-layout{display:flex;flex-direction:row;align-items:flex-start;justify-content:center;gap:8px}
+.pgd{width:9px;height:9px;border-radius:50%;background:rgba(245,240,232,.15);transition:background .3s}
+.pgd.done{background:var(--red)}
+
+/* ═══════════════════════════════════════════
+   THREE-CUT / PRUNING INTRO
+═══════════════════════════════════════════ */
+.tc-dot{width:8px;height:8px;border-radius:50%;border:1.5px solid;transition:all .35s;flex-shrink:0}
+.tc-dot.on{transform:scale(1.4)}
+.tc-dot.done{opacity:.5}
+.tc-sc{transition:opacity .4s,transform .4s}
+
+/* ═══════════════════════════════════════════
+   SOP
+═══════════════════════════════════════════ */
+.sop-wrap{background:rgba(245,240,232,.02);border:1px solid var(--border);padding:2rem;margin-top:1.5rem}
+.sop-tabs{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:0;flex-wrap:wrap}
+.sop-tab{padding:.7rem 1.3rem;font-size:12px;color:var(--text-mid);background:none;border:none;cursor:pointer;transition:all .2s;border-bottom:2px solid transparent;margin-bottom:-1px;font-family:var(--sans)}
+.sop-tab:hover{color:var(--text)}
+.sop-tab.active{color:var(--gold);border-bottom-color:var(--gold)}
+.sop-panels{padding-top:1.8rem}
+.sop-panel{display:none}
+.sop-panel.active{display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:start}
+.sop-panel-text h3{font-family:var(--serif);font-size:1.2rem;font-weight:700;color:var(--cream);margin-bottom:.9rem;line-height:1.4}
+.sop-panel-text p{font-size:13px;color:var(--text-mid);line-height:2;margin-bottom:.9rem}
+.sop-tip{background:var(--gold-glow);border:1px solid var(--border-gold);padding:.9rem 1.1rem;margin-top:.9rem;font-size:12px;color:var(--text-mid);line-height:1.8}
+.sop-tip::before{content:'樹藝師說';display:block;font-size:9px;letter-spacing:.2em;color:var(--gold);margin-bottom:.3rem}
+.sop-viz{background:rgba(245,240,232,.03);border:1px solid var(--border);padding:1.5rem;min-height:280px;display:flex;align-items:center;justify-content:center}
+.sop-nav{display:flex;justify-content:space-between;align-items:center;margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid var(--border)}
+.sop-nav-btn{background:none;border:1px solid rgba(201,168,76,.4);color:var(--text-mid);font-size:12px;font-family:var(--sans);padding:6px 18px;cursor:pointer;transition:all .2s}
+.sop-nav-btn:hover{border-color:var(--gold);color:var(--cream)}
+.sop-nav-btn:disabled{opacity:.2;cursor:default}
+.sop-progress{font-size:12px;color:var(--text-dim);letter-spacing:.1em}
+
+/* ═══════════════════════════════════════════
+   CERT GRID
+═══════════════════════════════════════════ */
+.cert-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:1.5rem 0}
+.cert-item{background:rgba(245,240,232,.03);border:1px solid var(--border);padding:1.2rem}
+.cert-scope{font-size:10px;letter-spacing:.1em;color:var(--gold);margin-bottom:.4rem}
+.cert-title{font-size:14px;color:var(--cream);margin-bottom:.4rem;font-weight:500}
+.cert-text{font-size:12px;color:var(--text-mid);line-height:1.7}
+
+/* ═══════════════════════════════════════════
+   CLOSING
+═══════════════════════════════════════════ */
+.closing{padding:10vw 2rem 8vw;max-width:760px;margin:0 auto;text-align:center}
+.closing-big{font-family:var(--serif);font-size:clamp(1.8rem,4vw,3.4rem);font-weight:900;line-height:1.3;margin-bottom:1.5rem;color:var(--cream)}
+.closing-big em{color:var(--gold);font-style:normal}
+.closing-body{font-family:var(--serif);font-size:clamp(.95rem,1.8vw,1.1rem);font-weight:300;color:var(--text-mid);line-height:2.1;margin-bottom:3rem}
+.next-btn{display:inline-block;border:1px solid var(--border-gold);padding:1.2rem 3rem;color:var(--gold);text-decoration:none;font-family:var(--serif);font-size:14px;font-weight:700;cursor:pointer;background:none;transition:all .25s;letter-spacing:.05em}
+.next-btn:hover{border-color:var(--gold);background:var(--gold-glow)}
+
+/* incident block */
+.incident{border-left:2px solid var(--red);padding:.4rem 0 .4rem 1.5rem;margin:2rem 0}
+.incident p{color:rgba(245,240,232,.9)}
+
+/* pivot question */
+.pivot-q{font-family:var(--serif);font-size:clamp(1.3rem,2.8vw,1.9rem);font-weight:700;color:var(--gold);line-height:1.5;margin:2.5rem 0 1.2rem}
+
+/* ═══════════════════════════════════════════
+   FOOTER / TOC
+═══════════════════════════════════════════ */
+footer{border-top:1px solid var(--border);padding:3rem 2rem;text-align:center;font-size:11px;color:var(--text-dim);line-height:2.2}
+
+#side-toc{position:fixed;left:22px;top:50%;transform:translateY(-50%);z-index:400;display:none;flex-direction:column;gap:0;max-height:80vh}
+#side-toc.vis{display:flex}
+.stoc-group{display:none;flex-direction:column;gap:0}
+.stoc-group.on{display:flex}
+.stoc-part-label{font-size:8px;letter-spacing:.35em;color:var(--gold);margin-bottom:10px;opacity:.7}
+.stoc-item{display:flex;align-items:center;gap:10px;cursor:pointer;padding:5px 0;transition:all .2s;position:relative}
+.stoc-num{font-size:9px;color:var(--text-dim);letter-spacing:.05em;width:18px;flex-shrink:0;transition:color .2s}
+.stoc-dot{width:6px;height:6px;border-radius:50%;background:rgba(245,240,232,.18);border:1px solid rgba(245,240,232,.18);flex-shrink:0;transition:all .25s}
+.stoc-lbl{font-size:11px;color:var(--text-dim);white-space:nowrap;transition:all .2s;max-width:130px;overflow:hidden;text-overflow:ellipsis}
+.stoc-item:hover .stoc-num,.stoc-item.on .stoc-num{color:var(--gold)}
+.stoc-item:hover .stoc-lbl{color:rgba(245,240,232,.8)}
+.stoc-item.on .stoc-lbl{color:var(--cream);font-weight:600}
+.stoc-item.on .stoc-dot{background:var(--gold);border-color:var(--gold);transform:scale(1.3)}
+.stoc-item.done .stoc-dot{background:rgba(201,168,76,.4);border-color:rgba(201,168,76,.35)}
+.stoc-item.done .stoc-lbl{color:rgba(245,240,232,.35)}
+.stoc-item::before{content:'';position:absolute;left:31px;top:0;bottom:0;width:1px;background:rgba(245,240,232,.05);pointer-events:none}
+.stoc-item.done::before{background:rgba(201,168,76,.18)}
+@media(max-width:1180px){#side-toc{display:none!important}}
+
+/* hunger box */
+.hunger-box{background:rgba(0,0,0,.25);border:1px solid var(--border);padding:2.5rem 2rem;margin-top:2.5rem}
+.hunger-quote{font-family:var(--serif);font-size:clamp(.95rem,1.8vw,1.1rem);line-height:2;color:var(--text-mid);margin-bottom:1.2rem}
+.hunger-close{font-family:var(--serif);font-size:clamp(1rem,1.9vw,1.15rem);color:var(--cream);font-weight:600;border-top:1px solid var(--border);padding-top:1.5rem;text-align:center;line-height:1.9}
+
+/* ═══════════════════════════════════════════
+   REVEAL ANIMATIONS
+═══════════════════════════════════════════ */
+.reveal{opacity:0;transform:translateY(22px);transition:opacity .7s ease,transform .7s ease}
+.reveal.vis{opacity:1;transform:translateY(0)}
+.reveal-l{opacity:0;transform:translateX(-22px);transition:opacity .7s ease,transform .7s ease}
+.reveal-l.vis{opacity:1;transform:translateX(0)}
+
+@keyframes riseIn{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes pulse{0%,100%{opacity:.3}50%{opacity:1}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.fade-up{animation:fadeUp .28s ease forwards}
+
+/* ═══════════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════════ */
+@media(max-width:640px){
+  .photo-grid,.cert-grid,.stats-band{grid-template-columns:1fr}
+  .sop-panel.active{grid-template-columns:1fr}
+  .scroll-step{padding:0 20px}
+  .step-card{max-width:92vw}
+  .stat-callout{flex-direction:column;gap:8px}
+  #pg-layout{flex-direction:column;align-items:center}
+}
+@media(max-width:900px){
+  .cert-grid{grid-template-columns:1fr 1fr}
+}
+
+/* ═══════════════════════════════════════════
+   MOBILE COMPREHENSIVE (≤ 768px)
+═══════════════════════════════════════════ */
+@media(max-width:768px){
+  /* ── Nav ── */
+  .nav-inner{padding:0 12px}
+  .nav-logo{font-size:10px;letter-spacing:0;max-width:105px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+  .part-btn{padding:12px 10px;font-size:11px;letter-spacing:.02em}
+  .part-btn .part-sub{display:none}
+
+  /* ── Hero ── */
+  .hero-c{padding:0 1rem}
+  .hero-tag{margin-bottom:1.2rem;font-size:9px}
+  .hero-h1{margin-bottom:1rem}
+  .hero-sub{font-size:.92rem}
+  .hero-choose{gap:10px;margin-top:2rem}
+  .choose-btn{min-width:0;flex:1;padding:.85rem .6rem;font-size:13px}
+
+  /* ── Sticky step cards ── */
+  .step-card{padding:1.5rem 1.4rem;max-width:92vw}
+  .step-card.br-sc{padding:1.5rem 1.4rem;max-width:92vw}
+  .step-card h3{font-size:clamp(1.2rem,4.5vw,1.7rem)}
+
+  /* ── Sat section & all scroll steps: center on mobile ── */
+  #sat-section .scroll-step{justify-content:center}
+  .scroll-step{padding:0 4vw}
+
+  /* ── Part 2 left / right sticky cards: center ── */
+  .sc-r,.sc-l{justify-content:center;padding:0 4vw}
+
+  /* ── Photo grid 2-col → 1-col ── */
+  .photo-grid-2{grid-template-columns:1fr}
+
+  /* ── Prose ── */
+  .prose{padding:8vw 1.2rem}
+  .prose-wide{padding:6vw 1.2rem}
+
+  /* ── Chapter intro / section header ── */
+  .chapter-intro{padding:8vw 1.2rem 5vw}
+  .sec-hd{margin-bottom:1.5rem}
+
+  /* ── Pull quote ── */
+  .pull{padding:.8rem 1.2rem;margin:1.8rem 0}
+
+  /* ── Chain tabs: 2×2 grid ── */
+  .chain-tabs{grid-template-columns:1fr 1fr}
+  .chain-tab{border-right:none;border-bottom:1px solid var(--border)}
+  .chain-tab:nth-child(1),.chain-tab:nth-child(3){border-right:1px solid var(--border)}
+  .chain-controls{flex-wrap:wrap;gap:8px;padding:10px 14px}
+  .btn-ctrl{width:80px;font-size:11px}
+
+  /* ── CRT chart ── */
+  #crt .crt-chart{gap:12px;padding:0}
+  #crt .crt-col{max-width:none}
+  #crt .crt-bar-wrap{height:180px}
+  #crt .crt-seg{font-size:13px}
+
+  /* ── Pruning interactive ── */
+  .pg-wrap{padding:1.5rem 1rem 1.2rem}
+  .pg-title{font-size:14px}
+
+  /* ── Closing ── */
+  .closing-card{padding:2rem 1.4rem}
+  .closing{padding:8vw 1.2rem 6vw}
+  .closing-big{font-size:clamp(1.5rem,5vw,2.6rem)}
+
+  /* ── Stat callout ── */
+  .stat-callout{padding:1.2rem 0}
+
+  /* ── Disease bars ── */
+  .d-row{grid-template-columns:80px 1fr 44px;gap:8px}
+  .d-name{font-size:11px}
+
+  /* ── Flourish 橫置提示：手機才顯示 ── */
+  .flourish-rotate-hint{display:block!important}
+
+  /* ── Chain: 手機顯示 SVG（縮放顯示） ── */
+  #chain-svg{display:block}
+  .chain-caption{min-height:80px;padding:16px 14px}
+  .chain-cap-text{font-size:13px;line-height:1.85}
+  .chain-cap-step{font-size:9px}
+
+  /* ── Footer ── */
+  footer{line-height:2.0;padding:2.4rem 1.2rem}
+  footer div{line-height:2.0}
+
+  /* ── Touch: 去除點擊高亮、加速 tap 響應 ── */
+  button,.chain-tab,.crt-seg,.choose-btn,.part-btn,.sop-tab,.next-btn{
+    -webkit-tap-highlight-color:transparent;
+    touch-action:manipulation;
+  }
+
+  /* ── 認證時間軸段落（sec-p2-05）：手機改成單欄，修正橫向溢出 ── */
+  #sec-p2-05 > div{flex-direction:column}
+  #tl-cards-col{flex:none!important;max-width:100%!important;width:100%!important;padding:40px 1.2rem 60px!important}
+  #tl-cards-col + div{display:none}
+
+  /* ── 修剪互動（#pg-layout）：手機改為直向，修正橫向溢出 ── */
+  #pg-layout{flex-direction:column!important;align-items:center!important;gap:12px!important}
+  #pg-layout > div:first-child{padding-top:0!important;order:2}
+  #pg-layout > div:nth-child(2){order:1}
+  #pg-layout > div:last-child{width:min(280px,82vw)!important;order:3}
+
+  /* ── SOP 樹木 SVG & 三段修剪 SVG：手機放大以提升可讀性 ── */
+  .sop-vsvg{width:min(58vw,260px)!important}
+  #tc-svg{width:min(80vw,400px)!important}
+}
+/* ── 影片快轉鈕 ── */
+.sp-btn{background:rgba(8,10,8,0.7);border:1px solid rgba(245,240,232,0.25);color:rgba(245,240,232,0.6);
+  font-size:11px;font-family:var(--sans);letter-spacing:.06em;padding:5px 12px;cursor:pointer;
+  transition:all .18s;border-radius:2px}
+.sp-btn:hover{border-color:var(--gold);color:var(--cream)}
+.sp-btn.sp-active{border-color:var(--gold);color:var(--gold);background:rgba(201,168,76,0.12)}
+/* ── 結尾段落 ── */
+.closing-sc{opacity:0;transform:translateY(28px);transition:opacity .9s ease,transform .9s ease}
+.closing-sc.vis{opacity:1;transform:translateY(0)}
+.closing-card{padding:2.8rem 3rem}
+/* ── 地圖段落 responsive ── */
+.map-sticky{position:sticky;top:0;height:calc(var(--vh,1vh)*100);width:100%;overflow:hidden;z-index:1;background:#080a08}
+.map-driver{position:relative;margin-top:-100vh;z-index:2;pointer-events:none}
+.map-driver-row{height:calc(var(--vh,1vh)*100);display:flex;align-items:center;justify-content:flex-end;padding:0 6vw}
+.map-mobile{display:none}
+@media(max-width:768px){
+  .map-sticky{position:sticky;top:0;height:calc(var(--vh,1vh)*100)}
+  .map-driver{display:block}
+  .map-driver-row{justify-content:center;align-items:flex-end;padding:0 4vw 8vh}
+  .map-sc{max-width:calc(100% - 2rem)!important;width:auto!important}
+  .map-mobile{display:none}
+}
+</style>
+<script>
+/* ── YOUTUBE IFRAME API ── */
+window.ytPlayers={};
+window.ytFieldPlayer=null;
+var YT_COVERS={
+  'hero-video-iframe':'hero-yt-cover',
+  'field-video-iframe':'field-yt-cover'
+};
+function onYouTubeIframeAPIReady(){
+  ['hero-video-iframe','field-video-iframe','closing-video-iframe','closing-video-b-iframe'].forEach(function(id){
+    window.ytPlayers[id]=new YT.Player(id,{
+      events:{
+        onReady:function(e){
+          if(id==='field-video-iframe'){e.target.setVolume(0);}
+          else{e.target.mute();}
+        },
+        onStateChange:function(e){
+          if(e.data===1){/* PLAYING */
+            var coverId=YT_COVERS[id];
+            if(coverId){
+              var c=document.getElementById(coverId);
+              if(c){c.style.opacity='0';setTimeout(function(){c.style.display='none';},1300);}
+            }
+          }
+        }
+      }
+    });
+  });
+  window.ytFieldPlayer=window.ytPlayers['field-video-iframe'];
+}
+window.ytPlayAll=function(){
+  Object.keys(window.ytPlayers).forEach(function(id){
+    var p=window.ytPlayers[id];
+    try{if(p&&p.playVideo){p.mute();p.playVideo();}}catch(e){}
+  });
+};
+(function(){
+  var s=document.createElement('script');
+  s.src='https://www.youtube.com/iframe_api';
+  document.head.appendChild(s);
+})();
+</script>
+</head>
+<body>
+<div id="pbar"></div>
+
+<!-- ═══ NAV ═══ -->
+<nav id="top-nav">
+  <div class="nav-inner">
+    <div class="nav-logo">路樹殺人，是天災還是人禍？</div>
+    <button class="part-btn active" onclick="switchPart('p1',this)" id="btn-p1">
+      <span class="part-sub">第一篇</span>地下的病
+    </button>
+    <button class="part-btn" onclick="switchPart('p2',this)" id="btn-p2">
+      <span class="part-sub">第二篇</span>誰來修這棵樹
+    </button>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════════════════
+     HERO
+═══════════════════════════════════════════ -->
+<section id="hero">
+  <div id="hero-video" style="position:absolute;top:0;left:0;width:100%;height:100%;overflow:hidden;opacity:.62;filter:saturate(1.1) brightness(.72);pointer-events:none;">
+    <div id="hero-yt-cover" style="position:absolute;inset:0;background:#060604;z-index:1;transition:opacity 1.2s ease;pointer-events:none;"></div>
+    <iframe id="hero-video-iframe" src="https://www.youtube.com/embed/KW6xv3sCJEs?autoplay=1&mute=1&loop=1&playlist=KW6xv3sCJEs&controls=0&rel=0&modestbranding=1&playsinline=1&enablejsapi=1"
+      style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:177.78vh;height:100vh;min-width:100%;min-height:56.25vw;"
+      frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
+  </div>
+  <div style="position:absolute;bottom:.6rem;right:.8rem;z-index:3;font-size:9px;color:rgba(245,240,232,.2);letter-spacing:.04em;">示意影片　來源：Pexels</div>
+  <div class="hero-ov"></div>
+  <!-- 點擊啟動層 -->
+  <div id="hero-start" style="position:absolute;inset:0;z-index:10;display:flex;align-items:center;justify-content:center;cursor:pointer;">
+    <div style="display:flex;flex-direction:column;align-items:center;gap:22px;pointer-events:none;">
+      <div class="hs-ring hs-ring-3"></div>
+      <div class="hs-ring hs-ring-2"></div>
+      <div class="hs-ring hs-ring-1">
+        <div style="width:18px;height:18px;border-radius:50%;background:var(--gold);opacity:.95;"></div>
+      </div>
+      <span style="font-size:12px;letter-spacing:.5em;color:rgba(201,168,76,.9);font-family:var(--sans);margin-top:4px;">點 擊 開 始</span>
+    </div>
+  </div>
+  <div class="hero-c">
+    <div class="hero-tag">深度報導</div>
+    <h1 class="hero-h1">路樹殺人，是<em>天災</em>還是人禍？</h1>
+    <p class="hero-sub">風一來，全台緊張，樹倒再補樹的循環什麼時候才會斷？<br>在台北市密集的綠蔭之下，一場宛如「樹界黑死病」的疾病正在蔓延。</p>
+    <div class="hero-choose" id="hero-choose">
+      <button class="choose-btn" onclick="heroGo('p1')"><span class="btn-sub">第 一 篇</span>地下的病</button>
+      <button class="choose-btn" onclick="heroGo('p2')"><span class="btn-sub">第 二 篇</span>誰來修這棵樹</button>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     PART 1
+═══════════════════════════════════════════ -->
+<div id="p1" class="part">
+
+  <!-- 01 CHAPTER INTRO -->
+  <section class="scene scene-dark" id="sec-p1-01">
+    <div class="chapter-intro reveal">
+      <span class="chapter-num">第一篇 — 地下的病</span>
+      <h2 class="chapter-h">天災，<em>還是人禍</em>？</h2>
+      <p class="chapter-lead">近年來，台灣各地接連發生路樹無預警倒伏事件，從校園到街頭行道樹，從壓毀車輛到奪走人命，城市裡原本象徵綠意與安全的行道樹，逐漸成為潛伏的風險。</p>
+    </div>
+    <div class="prose reveal" style="padding-top:0">
+      <div class="pull">
+        <p>「我到現場的時候，有一段將近40公分的枝幹被截斷，那不是最近修剪的痕跡，不定芽已經長出來，代表至少是3年、甚至5年前留下的傷口。」</p>
+        <cite>大安森林之友基金會副執行長陳鴻楷</cite>
+      </div>
+      <p class="body-p">對榕樹而言，這樣的大面積切口難以癒合，長年暴露之下導致樹勢逐漸變弱，反而成為病菌入侵的破口。</p>
+    </div>
+  </section>
+
+  <!-- 02 SATELLITE STICKY SEQUENCE -->
+  <section class="sticky-seq scene-dark" id="sat-section">
+    <div class="sticky-canvas">
+      <div id="sat-bg"></div>
+      <div class="sat-frame">
+        <!-- 2010 -->
+        <div class="sat-layer" id="sl-0" style="opacity:1">
+          <div class="sat-inner">
+            <img src="images/img8.png" alt="逢甲2010">
+          </div>
+          <div class="sat-year-label">2010</div>
+          <div class="sat-src">Google Earth</div>
+        </div>
+        <!-- 2023 -->
+        <div class="sat-layer" id="sl-1" style="opacity:0">
+          <div class="sat-inner">
+            <img src="images/img1.png" alt="逢甲2023">
+          </div>
+          <div class="sat-year-label">2023</div>
+          <div class="sat-src">Google Earth</div>
+        </div>
+        <!-- 2024 -->
+        <div class="sat-layer" id="sl-2" style="opacity:0">
+          <div class="sat-inner">
+            <img src="images/img2.png" alt="逢甲2024">
+          </div>
+          <div class="sat-year-label" style="color:rgba(224,112,112,.6)">2024</div>
+          <div class="sat-src">Google Earth</div>
+        </div>
+        <!-- 2025 -->
+        <div class="sat-layer" id="sl-3" style="opacity:0">
+          <div class="sat-inner">
+            <img src="images/img3.png" alt="逢甲2025">
+          </div>
+          <div class="sat-year-label" style="color:rgba(192,57,43,.85)">2025</div>
+          <div class="sat-src">Google Earth</div>
+        </div>
+        <!-- 事發後 -->
+        <div class="sat-layer" id="sl-4" style="opacity:0">
+          <div class="sat-inner">
+            <img src="images/img9.png" alt="逢甲事發後">
+          </div>
+          <div class="sat-year-label" style="color:rgba(192,57,43,.5)">事發後</div>
+          <div class="sat-src">Google Earth</div>
+        </div>
+        <div class="sat-dots">
+          <div class="sat-dot on" id="sdot-0"></div>
+          <div class="sat-dot" id="sdot-1"></div>
+          <div class="sat-dot" id="sdot-2"></div>
+          <div class="sat-dot" id="sdot-3"></div>
+          <div class="sat-dot" id="sdot-4"></div>
+        </div>
+      </div>
+    </div>
+    <div class="scroll-steps">
+      <div class="scroll-step"><div class="step-card" data-sat="0">
+        <span class="s-num">歷史影像比對 — 01</span>
+        <h3>2010年：<em>60年老榕樹</em></h3>
+        <p>逢甲大學知名榕樹大道1棵樹齡約60年老榕樹，這個地方是校內許多學生上學必經之路；倒伏榕樹所在花台寬約6.5公尺，但校園內仍有不少榕樹種在僅約1公尺見方的狹小花台中，樹體卻同樣龐大。</p>
+      </div></div>
+      <div class="scroll-step"><div class="step-card" data-sat="1">
+        <span class="s-num">歷史影像比對 — 02</span>
+        <h3>2023年：<em>觀察樹冠變化</em></h3>
+        <p>逢甲大學知名榕樹大道1棵樹齡約60年老榕樹，這個地方是校內許多學生上學必經之路。</p>
+      </div></div>
+      <div class="scroll-step"><div class="step-card" data-sat="2">
+        <span class="s-num">歷史影像比對 — 03</span>
+        <h3>2024年：<em>修剪後驟然縮小</em></h3>
+        <p>一年後，同一批樹的樹冠<strong>明顯縮減</strong>。陳鴻楷指出，過度修剪降低光合作用能力，會樹勢逐漸衰弱。</p>
+      </div></div>
+      <div class="scroll-step"><div class="step-card" data-sat="3">
+        <span class="s-num">歷史影像比對 — 04</span>
+        <h3>2025年：<em>倒下，奪走生命</em></h3>
+        <p>2025年6月，其中一棵榕樹<strong>無預警倒塌，釀1死3傷</strong>。相關調查發現根部已有褐根病跡象。</p>
+      </div></div>
+      <div class="scroll-step"><div class="step-card" data-sat="4">
+        <span class="s-num">衛星影像比對 — 05</span>
+        <h3>事發後：<em>樹木已被移除</em></h3>
+        <p>事故發生後，相關樹木遭緊急移除，事故發生後，陳鴻楷於五天內及數月後兩度回訪，相關花台仍未見明顯改善。</p>
+      </div></div>
+    </div>
+  </section>
+
+  <!-- 03 SOCIAL VOLUME CHART -->
+  <section class="scene scene-accent" id="sec-p1-vol">
+    <div class="prose reveal" style="padding-bottom:3rem">
+      <div class="sec-hd">
+        <span class="sec-num">路樹議題社群聲量</span>
+        <h2 class="sec-h">颱風一來，討論爆增<br><em>風過之後，歸零</em></h2>
+        <p class="sec-desc">每逢颱風或倒樹傷亡，聲量急升；褐根病與修剪修剪關鍵字全年幾近於零</p>
+      </div>
+      <div class="chart-box">
+        <div style="display:flex;flex-wrap:wrap;gap:14px;margin-bottom:1rem;font-size:11px;color:var(--text-mid);">
+          <span style="display:flex;align-items:center;gap:5px;"><span style="width:11px;height:11px;background:#C0392B;border-radius:2px;display:inline-block;"></span>樹倒</span>
+          <span style="display:flex;align-items:center;gap:5px;"><span style="width:11px;height:11px;background:#4A7EAA;border-radius:2px;display:inline-block;"></span>路樹</span>
+          <span style="display:flex;align-items:center;gap:5px;"><span style="width:11px;height:11px;background:#7A7A70;border-radius:2px;display:inline-block;"></span>褐根病</span>
+          <span style="display:flex;align-items:center;gap:5px;"><span style="width:11px;height:11px;background:#5A8A2E;border-radius:2px;display:inline-block;"></span>樹木修剪</span>
+        </div>
+        <div style="position:relative;width:100%;height:260px;">
+          <canvas id="chart4s" role="img" aria-label="2025年5月至2026年4月路樹相關四個關鍵字月度聲量長條圖"></canvas>
+        </div>
+        <div style="font-size:11px;color:var(--text-dim);margin-top:.6rem;">X軸：月份（2025年5月—2026年4月）／Y軸：社群聲量（則數）</div>
+        <div style="display:flex;flex-wrap:wrap;gap:1rem;margin-top:.6rem;font-size:11px;color:var(--text-mid);">
+          <span><span style="color:#C0392B;font-weight:500;">▲ 2025/06</span> 逢甲大學樹倒壓死碩一生</span>
+          <span><span style="color:#C0392B;font-weight:500;">▲ 2025/07</span> 颱風丹娜絲重創南台灣</span>
+          <span><span style="color:#4A7EAA;font-weight:500;">▲ 2025/10</span> 颱風康芮，台北逾2,000棵路樹倒塌</span>
+        </div>
+      </div>
+      <p class="chart-caption">資料來源：Opview社群口碑資料庫（2025年5月—2026年4月）　製圖：林子皓</p>
+    </div>
+  </section>
+
+  <!-- 04 DISEASE TREND -->
+  <section id="sec-p1-02" style="position:relative;background:#0f0f0a;">
+
+    <!-- Sticky container: full viewport, dark bg, Flourish iframe sits inside with blend overlay -->
+    <div style="position:sticky;top:0;height:calc(var(--vh,1vh)*100);width:100%;overflow:hidden;z-index:1;background:#0f0f0a;display:flex;align-items:center;justify-content:center;">
+
+      <!-- Flourish iframe — centred, comfortable size -->
+      <div class="flourish-embed flourish-bar-chart-race" data-src="visualisation/28490767"
+           style="width:min(88vw,960px);height:68vh;position:relative;z-index:1;">
+        <noscript><img src="https://public.flourish.studio/visualisation/28490767/thumbnail" width="100%" alt="bar-chart-race visualization"/></noscript>
+      </div>
+      <!-- 手機橫置提示 -->
+      <div class="flourish-rotate-hint" style="display:none;position:absolute;bottom:16px;left:50%;transform:translateX(-50%);z-index:6;background:rgba(14,14,9,.82);border:1px solid rgba(201,168,76,.3);padding:6px 14px;font-size:10px;letter-spacing:.08em;color:rgba(201,168,76,.8);white-space:nowrap;backdrop-filter:blur(6px);">
+        📱 建議橫置裝置以獲得最佳體驗
+      </div>
+
+      <!--
+        Dark blend overlay: multiply + opacity darkens the white Flourish bg
+        and tints it toward the report's dark colour palette.
+        pointer-events:none so the chart stays interactive underneath.
+      -->
+      <div style="position:absolute;inset:0;z-index:2;pointer-events:none;
+                  background:rgba(14,14,9,0.15);"></div>
+
+      <!-- Subtle gold-tinted vignette at edges for depth -->
+      <div style="position:absolute;inset:0;z-index:3;pointer-events:none;
+                  background:radial-gradient(ellipse 85% 80% at 50% 50%,
+                    transparent 55%,
+                    rgba(8,8,5,0.35) 100%);"></div>
+    </div>
+
+    <!-- Scroll driver -->
+    <div style="position:relative;margin-top:-100vh;z-index:4;pointer-events:none;">
+      <div style="height:120vh;"></div>
+
+      <div style="height:calc(var(--vh,1vh)*100);display:flex;align-items:flex-end;justify-content:flex-end;padding:0 4vw 20vh;">
+        <div class="step-card" data-step-disease="0" style="pointer-events:auto;max-width:380px;">
+          <span class="s-num">02 — 褐根病趨勢</span>
+          <h3>褐根病<em>佔近六成</em></h3>
+          <p>根據林木疫情鑑定與資訊中心通報資料，以台北市2016至2025年為例，褐根病始終是最大宗的病害，<strong>佔所有通報的近六成</strong>，且數量持續攀升，遠超其他病害種類。</p>
+        </div>
+      </div>
+
+      <div style="height:calc(var(--vh,1vh)*100);display:flex;align-items:flex-end;justify-content:flex-end;padding:0 4vw 20vh;">
+        <div class="step-card" data-step-disease="1" style="pointer-events:auto;max-width:380px;">
+          <span class="s-num">02 — 褐根病趨勢</span>
+          <h3>每年通報數<em>持續增加</em></h3>
+          <p>褐根病菌會入侵樹木的根部組織，導致原本堅固的根部變得脆弱，影響根部吸收養分，最終導致支撐力下降，最終倒下。</p>
+          <p style="font-size:11px;color:var(--text-dim);margin-top:.8rem">資料來源：農業部林業試驗所林木疫情鑑定與資訊中心（2016–2025，臺北市）；製圖：張耀銘、吳冠廷</p>
+        </div>
+      </div>
+
+      <div style="height:50vh;"></div>
+    </div>
+
+  </section>
+
+  <!-- 05 MAP -->
+  <section id="map-section" style="position:relative;background:#080a08;">
+
+    <!-- Flourish 動態地圖（替換影片） -->
+    <div class="map-sticky">
+      <!-- Flourish 動態地圖 -->
+      <div id="map-sentinel" style="position:absolute;top:0;left:0;width:1px;height:1px;z-index:0;"></div>
+      <div class="flourish-embed flourish-map" data-src="visualisation/29090152">
+        <noscript><img src="https://public.flourish.studio/visualisation/29090152/thumbnail" width="100%" alt="map visualization"/></noscript>
+      </div>
+      <!-- 年份疊加層 -->
+      <div id="map-year-display" style="
+        position:absolute;top:28px;left:20vw;z-index:6;
+        font-size:clamp(2.8rem,7vw,5.5rem);font-weight:900;
+        color:rgba(245,240,232,0.92);font-family:'Noto Serif TC',serif;
+        text-shadow:2px 2px 16px rgba(0,0,0,0.95),-2px -2px 16px rgba(0,0,0,0.95);
+        pointer-events:none;letter-spacing:.02em;line-height:1;
+      ">2016</div>
+      <!-- 全域暗色疊層 -->
+      <div style="position:absolute;inset:0;z-index:2;pointer-events:none;background:rgba(8,10,8,0.12);"></div>
+      <!-- 上方暈邊（蓋黑邊） -->
+      <div style="position:absolute;top:0;left:0;right:0;height:22%;z-index:4;pointer-events:none;
+                  background:linear-gradient(to bottom,#080a08 0%,rgba(8,10,8,0.6) 55%,transparent 100%);"></div>
+      <!-- 下方暈邊（蓋黑邊） -->
+      <div style="position:absolute;bottom:0;left:0;right:0;height:40%;z-index:4;pointer-events:none;
+                  background:linear-gradient(to bottom,transparent 0%,rgba(8,10,8,0.92) 50%,#080a08 100%);"></div>
+      <!-- 左側暈邊（蓋黑邊） -->
+      <div style="position:absolute;top:0;left:0;bottom:0;width:22%;z-index:3;pointer-events:none;
+                  background:linear-gradient(to right,#080a08 0%,#080a08 15%,rgba(8,10,8,0.6) 55%,transparent 100%);"></div>
+      <!-- 右側漸層：字卡對比 + 蓋黑邊 -->
+      <div style="position:absolute;top:0;right:0;bottom:0;width:58%;z-index:3;pointer-events:none;
+                  background:linear-gradient(to left,#080a08 0%,#080a08 15%,rgba(8,10,8,0.82) 38%,rgba(8,10,8,0.4) 62%,transparent 100%);"></div>
+    </div>
+
+    <!-- 桌機：scroll driver 右側字卡 -->
+    <div class="map-driver">
+      <div class="map-driver-row">
+        <div class="step-card map-sc" data-map="0" style="pointer-events:auto;max-width:420px;width:40vw;">
+          <span class="s-num">03 — 重災區分布</span>
+          <h3>文山、大安、中山<br><em>是褐根病通報高</em></h3>
+          <p>根據數據顯示，從2016年到2025年為止，台北市十二個行政區中，<strong>文山區以769件高居第一</strong>，大安區（707件）、中山區（585件）緊追在後，三區合計佔全市總量的約四成。</p>
+        </div>
+      </div>
+      <div class="map-driver-row">
+        <div class="step-card map-sc" data-map="1" style="pointer-events:auto;max-width:420px;width:40vw;">
+          <span class="s-num">04 — 感染點位</span>
+          <h3>每一個點，<br><em>都是一棵生病的樹</em></h3>
+          <p>點位遍布全台北市，且往往集中在<strong>人口密集、行人頻繁活動的區域</strong>，與市民日常生活高度重疊。</p>
+          <div style="margin-top:.9rem;padding:.5rem .8rem;border:1px solid rgba(201,168,76,0.35);background:rgba(201,168,76,0.06);font-size:11px;color:rgba(201,168,76,0.8);letter-spacing:.05em;">
+            ☝ 互動提醒：點擊滑動地圖
+          </div>
+          <div style="margin-top:.6rem;font-size:10px;color:var(--text-dim);line-height:1.7">
+            ＊此圖僅顯示唯一座標點位<br>資料來源：農業部林業試驗所林木疫情鑑定與資訊中心
+          </div>
+        </div>
+      </div>
+      <div class="map-driver-row">
+        <div class="step-card map-sc" data-map="2" style="pointer-events:auto;max-width:420px;width:40vw;">
+          <span class="s-num">04 — 感染點位</span>
+          <h3><em>通報驟降，防治見效？</em></h3>
+          <p>2025年全市僅通報91件，降至近十年新低，但在2026年前四個月已反彈至197件，超越2025年全年。</p>
+        </div>
+      </div>
+      <div style="height:20vh;"></div>
+    </div>
+
+    <!-- 手機：字卡排在影片下方 -->
+    <div class="map-mobile">
+      <div class="step-card" style="margin-bottom:1rem;">
+        <span class="s-num">03 — 行政區分布</span>
+        <h3>文山、大安、中山<br><em>是褐根病累計通報數最高</em></h3>
+        <p>十年以來，台北市十二個行政區中，<strong>文山區以769件高居第一，大安區（707件）、中山區（585件）</strong>，這些也正是人口最密集、行道樹最多的市中心地帶。</p>
+      </div>
+      <div class="step-card" style="margin-bottom:1rem;">
+        <span class="s-num">04 — 感染點位</span>
+        <h3>每一個點，<br><em>都是一棵生病的樹</em></h3>
+        <p>點位遍布全台北市，且往往集中在<strong>人口密集、行人頻繁活動的區域</strong>，與市民日常生活高度重疊。</p>
+        <div style="margin-top:.9rem;padding:.5rem .8rem;border:1px solid rgba(201,168,76,0.35);background:rgba(201,168,76,0.06);font-size:11px;color:rgba(201,168,76,0.8);letter-spacing:.05em;">
+          ☝ 互動提醒：點擊滑動地圖
+        </div>
+        <div style="margin-top:.6rem;font-size:10px;color:var(--text-dim);line-height:1.7">
+          ＊此圖僅顯示唯一座標點位<br>資料來源：農業部林業試驗所林木疫情鑑定與資訊中心
+        </div>
+      </div>
+      <div class="step-card">
+        <span class="s-num">04 — 感染點位</span>
+        <h3><em>紅點蔓延城市中</em></h3>
+        <p>2025年全市僅通報91件，降至近十年新低，根據統計，2026年前四個月已反彈至197件，超越2025年全年累計。</p>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- 07 TWO TREES -->
+  <section class="scene scene-mid" id="sec-p1-05">
+    <div class="prose-wide reveal">
+      <div class="rule"></div>
+      <div class="sec-hd">
+        <span class="sec-num">04 — 同一條街的兩棵樹</span>
+        <h2 class="sec-h">外表相同，<em>命運截然不同</em></h2>
+        <p class="sec-desc">廟旁邊的這兩棵榕樹，一棵健康，一棵已感染褐根病，葉色轉黃、枝葉稀疏，差異在地表上隱約可見，地下的根部，早已是兩個世界。</p>
+      </div>
+      <div class="two-col">
+        <!-- 左欄：照片分上下兩組，中間埋觸發點 -->
+        <div>
+          <div class="tree-trigger" data-card="0"></div>
+          <div class="photo-grid-2">
+            <div class="photo-cell">
+              <img src="images/img4.jpg" alt="健康路樹">
+              <div class="photo-cap-below">
+                <span class="photo-badge badge-healthy">健康</span>
+                <span class="photo-cap-title">樹勢完整，枝葉茂盛</span>
+              </div>
+            </div>
+            <div class="photo-cell">
+              <img src="images/img5.jpg" alt="感染褐根病的榕樹">
+              <div class="photo-cap-below">
+                <span class="photo-badge badge-sick">感染褐根病</span>
+                <span class="photo-cap-title">外觀與健康樹無明顯差異，根部已開始腐爛</span>
+              </div>
+            </div>
+          </div>
+          <div class="tree-trigger" data-card="1"></div>
+          <div class="photo-grid-2">
+            <div class="photo-cell">
+              <img src="images/img6.jpg" alt="不當修剪後的傷口">
+              <div class="photo-cap-below">
+                <span class="photo-badge badge-warn">不當修剪留下的傷口</span>
+                <span class="photo-cap-title">同一棵感染榕樹，可見過往修剪留下的大型切口，榕樹傷口不易癒合，成為病菌入侵的破口</span>
+              </div>
+            </div>
+            <div class="photo-cell">
+              <img src="images/img7.jpg" alt="高風險樹">
+              <div class="photo-cap-below">
+                <span class="photo-badge badge-risk">高風險樹</span>
+                <span class="photo-cap-title">樹身上可明顯看到兩處傷口──一個已癒合，一個仍未癒合，隨時可能成為病菌入口</span>
+              </div>
+            </div>
+          </div>
+          <p style="font-size:11px;color:var(--text-dim);text-align:right;margin-top:.5rem">攝影：吳冠廷</p>
+        </div>
+        <!-- 右欄：sticky，卡片疊放一次顯示一張 -->
+        <div class="text-sticky">
+          <div class="cards-wrap">
+            <div class="side-card" id="tree-card-0">
+              <span class="s-num">先天不足，後天失調</span>
+              <h4>這棵樹，<em>只能被移除</em></h4>
+              <p>榕樹天生樹種對褐根病菌抗病性不佳，再加上鋪水泥限制它的根系發展，加上因為不當修剪造成傷口比較大，無法自行癒合就容易得病，在這種「先天不足，後天失調」的情況下，就只能被移除，留下一顆「樹頭」。</p>
+            </div>
+            <div class="side-card" id="tree-card-1">
+              <span class="s-num">樹藝師說</span>
+              <h4>移除，<em>不是砍到底</em></h4>
+              <p>東昕環境工程有限公司樹藝師林辰如表示，病樹與一般移樹差不多，都是由上而下慢慢截下來，並會刻意留下一個「樹頭」，之所以不砍到底，是因為根部對下方的作業人員來說很難立即清理，通常會把移除樹頭與後續的補植工程綁在一起。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 08 DISEASE EXPLAINER + TRANSMISSION -->
+  <section id="sec-p1-06" style="position:relative;background:#0a0806;">
+
+    <!-- STICKY: fullbleed photo, swapped by scroll -->
+    <div style="position:sticky;top:0;height:calc(var(--vh,1vh)*100);width:100%;overflow:hidden;z-index:1;">
+      <img id="br-img-0" src="images/brown-root-3.jpg" alt="褐根病樹木倒塌"
+        style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:saturate(0.7) brightness(0.65);transition:opacity .8s ease;opacity:1;">
+      <img id="br-img-1" src="images/brown-root-2.jpg" alt="褐根病網紋菌絲"
+        style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:saturate(0.65) brightness(0.6);transition:opacity .8s ease;opacity:0;">
+      <img id="br-img-2" src="褐根病資料夾/S__20987911_0.jpg" alt="褐根病纖維化截面"
+        style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:saturate(0.65) brightness(0.6);transition:opacity .8s ease;opacity:0;">
+      <img id="br-img-3" src="褐根病資料夾/S__20987911_0.jpg" alt="褐根病纖維化斷根"
+        style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:saturate(0.65) brightness(0.6);transition:opacity .8s ease;opacity:0;">
+      <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(8,6,4,0.25) 0%,rgba(8,6,4,0.15) 40%,rgba(8,6,4,0.72) 100%);pointer-events:none;z-index:2;"></div>
+      <div id="br-counter" style="position:absolute;bottom:20px;right:5vw;z-index:4;font-size:10px;letter-spacing:.3em;color:rgba(245,240,232,0.35);font-family:var(--sans);">1 / 4</div>
+      <div style="position:absolute;bottom:20px;left:5vw;z-index:4;font-size:10px;color:rgba(245,240,232,0.25);letter-spacing:.03em;">照片提供：林辰如</div>
+    </div>
+
+    <!-- SCROLL DRIVER -->
+    <div style="position:relative;margin-top:-100vh;z-index:2;pointer-events:none;">
+
+      <div style="height:calc(var(--vh,1vh)*100);display:flex;align-items:center;justify-content:center;padding:0 8vw;">
+        <div class="step-card br-sc" data-br="0" style="pointer-events:auto;max-width:580px;width:90vw;">
+          <span class="s-num">05 — 看不見的殺手</span>
+          <h3>無聲蔓延的<em>褐根病</em></h3>
+          <p>台灣大學植物病理與微生物學系教授兼系主任鍾嘉綾表示，褐根病基本上屬於「木材腐朽菌」，一般的木材腐朽菌主在森林生態系裡擔任分解者的角色，能把倒塌的樹木分解成其他微生物可運用的營養，<strong>只有很少數能去感染活的組織與樹木，而在台灣主要就是褐根病</strong>。倒下的那一刻，往往是病程的終點，而不是起點。</p>
+        </div>
+      </div>
+
+      <div style="height:calc(var(--vh,1vh)*100);display:flex;align-items:center;justify-content:center;padding:0 8vw;">
+        <div class="step-card br-sc" data-br="1" style="pointer-events:auto;max-width:580px;width:90vw;">
+          <span class="s-num">特徵 — 網紋菌絲</span>
+          <h3>褐色網<em>網紋</em>，是它的烙印</h3>
+          <p>褐根病侵入根部後，會在木質部留下<strong>典型的灰白、黃褐色網紋狀菌絲</strong>。這個特徵是判斷感染的重要依據，但通常只有在挖開根部或樹木倒塌後才看得見。</p>
+          <div style="margin-top:1rem;background:rgba(192,57,43,0.07);border:1px solid rgba(192,57,43,0.2);padding:.8rem 1rem;font-size:12px;color:var(--text-mid);line-height:1.8">
+            <span style="font-size:9px;letter-spacing:.2em;color:#e07060;display:block;margin-bottom:.3rem">鍾嘉綾指出</span>
+            大部分是目視評估，不會去挖根，所以的確可能誤判。真正確診，需要送林業試驗所培養與檢測。
+          </div>
+        </div>
+      </div>
+
+      <div style="height:calc(var(--vh,1vh)*100);display:flex;align-items:center;justify-content:center;padding:0 8vw;">
+        <div class="step-card br-sc" data-br="2" style="pointer-events:auto;max-width:580px;width:90vw;">
+          <span class="s-num">特徵  </span>
+          <h3>木質組織<em>軟化、纖維化</em></h3>
+          <p>病菌持續分解木質部，使原本堅固的樹幹內部<strong>失去承載力，變得鬆散易碎</strong>。孫岩章描述：「夏天1天會擴展1公分，時間一久就把裡面軟化。」</p>
+          <div style="margin-top:1rem;border-left:2px solid var(--gold);padding:.6rem 1rem;">
+            <span style="font-size:clamp(2rem,4vw,3rem);font-weight:900;color:var(--gold);font-family:var(--serif);line-height:1;">1</span>
+            <span style="font-size:13px;color:rgba(201,168,76,0.7);margin-left:6px;">公分 / 天</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="height:calc(var(--vh,1vh)*100);display:flex;align-items:center;justify-content:center;padding:0 8vw;">
+        <div class="step-card br-sc" data-br="3" style="pointer-events:auto;max-width:580px;width:90vw;">
+          <span class="s-num">特徵 — 如何辨識</span>
+          <h3>這就是<em>褐根病的樣子</em></h3>
+          <p>鍾嘉綾表示，樹木感染不容易發現，通常發現大概都到了中、後期，不同樹種表現病徵不同，<strong>像樟樹或榕樹可以撐比較久</strong>，會逐漸出現葉子變小、變黃等等，而病徵不明顯的樹種，可能到夏季病菌比較旺盛時，就突然呈現枯死狀態。</p>
+          <div style="margin-top:1rem;background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.2);padding:.8rem 1rem;font-size:12px;color:var(--text-mid);line-height:1.8">
+            <span style="font-size:9px;letter-spacing:.2em;color:var(--gold);display:block;margin-bottom:.3rem">孫岩章說</span>
+            台北氣候潮濕，此病菌喜熱，夏天活躍、冬天休眠，一旦風災來臨，病菌更可能隨倒木飛散，加速傳播。
+          </div>
+        </div>
+      </div>
+
+      <div style="height:50vh;"></div>
+    </div>
+
+    <!-- 傳播模式互動（non-sticky） -->
+    <div style="position:relative;z-index:10;background:#0e0e09;padding:60px 5vw 0;border-top:1px solid var(--border);">
+      <div style="max-width:760px;margin:0 auto;">
+        <div class="rule"></div>
+        <div class="sec-hd">
+          <span class="sec-num">圖解・褐根病傳播模式</span>
+          <h2 class="sec-h" style="font-size:clamp(1.4rem,3vw,2.2rem)">一棵病樹，如何感染整條街？</h2>
+          <p class="sec-desc">選擇傳播模式，逐步觀看病菌透過不同途徑擴散的過程。</p>
+          <div style="margin-top:1rem;display:inline-block;padding:.5rem .8rem;border:1px solid rgba(201,168,76,0.35);background:rgba(201,168,76,0.06);font-size:11px;color:rgba(201,168,76,0.8);letter-spacing:.05em;">
+            ☝ 互動提醒：選擇上方模式，點擊「下一步」觀看傳播過程
+          </div>
+        </div>
+      <div class="chain-outer">
+        <div class="chain-tabs">
+          <div class="chain-tab active" onclick="setMode(0)"><div class="ti">🌱</div><div class="tt">根部接觸</div></div>
+          <div class="chain-tab" onclick="setMode(1)"><div class="ti">💨</div><div class="tt">孢子飄散</div></div>
+          <div class="chain-tab" onclick="setMode(2)"><div class="ti">🚛</div><div class="tt">苗木移植</div></div>
+          <div class="chain-tab" onclick="setMode(3)"><div class="ti">🪵</div><div class="tt">土壤殘菌</div></div>
+        </div>
+        <svg id="chain-svg" viewBox="0 0 700 280" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <filter id="glowS" x="-30%" y="-30%" width="160%" height="160%">
+              <feGaussianBlur stdDeviation="2" result="b"/>
+              <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+            <clipPath id="cpSoil"><rect x="0" y="176" width="700" height="104"/></clipPath>
+            <clipPath id="cpSky"><rect x="0" y="0" width="700" height="178"/></clipPath>
+            <marker id="mRed" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+              <path d="M0,0 L6,3 L0,6Z" fill="#C0392B"/>
+            </marker>
+          </defs>
+          <rect x="0" y="0" width="700" height="280" fill="#1A1A14"/>
+          <rect x="0" y="174" width="700" height="2" fill="rgba(201,168,76,0.3)"/>
+          <rect x="0" y="176" width="700" height="104" fill="rgba(15,10,4,0.55)"/>
+          <text x="10" y="170" font-size="8" fill="rgba(245,240,232,0.35)" letter-spacing="2" font-family="Noto Sans TC">地面</text>
+          <text x="10" y="196" font-size="8" fill="rgba(245,240,232,0.35)" letter-spacing="2" font-family="Noto Sans TC">地下</text>
+          <g clip-path="url(#cpSoil)">
+            <path id="r1L" d="M84 176 Q70 198 52 208 Q38 213 22 222" stroke="#8B4513" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+            <path id="r1C" d="M90 176 Q88 202 85 226" stroke="#8B4513" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+            <path id="r1R" d="M96 176 Q112 198 134 206 Q152 212 166 220" stroke="#8B4513" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+            <path id="r2L" d="M214 176 Q198 198 178 206" stroke="rgba(139,100,60,0.5)" stroke-width="2" fill="none" stroke-linecap="round"/>
+            <path id="r2C" d="M220 176 Q217 202 214 226" stroke="rgba(139,100,60,0.5)" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+            <path id="r2R" d="M226 176 Q244 198 262 206" stroke="rgba(139,100,60,0.5)" stroke-width="2" fill="none" stroke-linecap="round"/>
+            <path id="r3L" d="M344 176 Q328 198 308 206" stroke="rgba(139,100,60,0.5)" stroke-width="2" fill="none" stroke-linecap="round"/>
+            <path id="r3C" d="M350 176 Q347 202 344 226" stroke="rgba(139,100,60,0.5)" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+            <path id="r3R" d="M356 176 Q374 198 392 206" stroke="rgba(139,100,60,0.5)" stroke-width="2" fill="none" stroke-linecap="round"/>
+            <path id="r4L" d="M474 176 Q458 198 438 206" stroke="rgba(139,100,60,0.5)" stroke-width="2" fill="none" stroke-linecap="round"/>
+            <path id="r4C" d="M480 176 Q477 202 474 226" stroke="rgba(139,100,60,0.5)" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+            <path id="r4R" d="M486 176 Q504 198 522 206" stroke="rgba(139,100,60,0.5)" stroke-width="2" fill="none" stroke-linecap="round"/>
+            <path id="r5L" d="M604 176 Q588 198 568 206" stroke="rgba(139,100,60,0.5)" stroke-width="2" fill="none" stroke-linecap="round"/>
+            <path id="r5C" d="M610 176 Q607 202 604 226" stroke="rgba(139,100,60,0.5)" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+            <path id="r5R" d="M616 176 Q634 198 652 206" stroke="rgba(139,100,60,0.5)" stroke-width="2" fill="none" stroke-linecap="round"/>
+            <path id="b12" d="M166 220 Q190 232 178 206" stroke="#C0392B" stroke-width="2.2" fill="none" stroke-dasharray="80" stroke-dashoffset="80" stroke-linecap="round"/>
+            <path id="b23" d="M262 206 Q303 222 308 206" stroke="#C0392B" stroke-width="2.2" fill="none" stroke-dasharray="80" stroke-dashoffset="80" stroke-linecap="round"/>
+            <path id="b34" d="M392 206 Q433 222 438 206" stroke="#C0392B" stroke-width="2.2" fill="none" stroke-dasharray="80" stroke-dashoffset="80" stroke-linecap="round"/>
+            <path id="b45" d="M522 206 Q563 222 568 206" stroke="#C0392B" stroke-width="2.2" fill="none" stroke-dasharray="80" stroke-dashoffset="80" stroke-linecap="round"/>
+            <g id="soil-blob" opacity="0">
+              <ellipse cx="545" cy="210" rx="20" ry="9" fill="#7a4820" opacity="0.35"/>
+              <ellipse cx="545" cy="210" rx="12" ry="5" fill="#C0392B" opacity="0.5"/>
+              <text x="545" y="228" text-anchor="middle" font-size="8" fill="rgba(245,240,232,0.45)" font-family="Noto Sans TC">殘留菌體</text>
+              <path id="soil-arrow" d="M558 212 Q577 212 568 206" stroke="#C0392B" stroke-width="1.8" fill="none" stroke-dasharray="4,3" opacity="0" marker-end="url(#mRed)"/>
+            </g>
+          </g>
+          <g id="spore-grp" opacity="0" clip-path="url(#cpSky)">
+            <path d="M76 150 Q68 154 70 162 Q79 166 90 163 Q94 156 86 151Z" fill="#7a4820" opacity="0.7"/>
+            <circle class="sp" cx="72" cy="140" r="2" fill="#A06030" opacity="0"/>
+            <circle class="sp" cx="79" cy="132" r="1.6" fill="#A06030" opacity="0"/>
+            <circle class="sp" cx="87" cy="125" r="1.8" fill="#A06030" opacity="0"/>
+            <circle class="sp" cx="97" cy="118" r="1.4" fill="#A06030" opacity="0"/>
+            <circle class="sp" cx="113" cy="112" r="1.6" fill="#A06030" opacity="0"/>
+            <circle class="sp" cx="136" cy="107" r="1.8" fill="#A06030" opacity="0"/>
+            <circle class="sp" cx="162" cy="103" r="1.6" fill="#A06030" opacity="0"/>
+            <path id="w1" d="M74 140 Q150 86 220 100" stroke="#C0392B" stroke-width="0.8" fill="none" stroke-dasharray="3,4" opacity="0"/>
+            <path id="w2" d="M74 140 Q208 68 350 94" stroke="#C0392B" stroke-width="0.8" fill="none" stroke-dasharray="3,4" opacity="0"/>
+            <circle id="lnd2" cx="220" cy="100" r="8" fill="none" stroke="#C0392B" stroke-width="1" stroke-dasharray="3,3" opacity="0"/>
+            <circle id="lnd3" cx="350" cy="94" r="8" fill="none" stroke="#C0392B" stroke-width="1" stroke-dasharray="3,3" opacity="0"/>
+          </g>
+          <g id="truck-grp" opacity="0">
+            <g id="truck" transform="translate(16,144)">
+              <rect x="0" y="18" width="52" height="22" rx="2" fill="#5a5040" stroke="#3a3028" stroke-width="0.8"/>
+              <rect x="0" y="10" width="22" height="20" rx="2" fill="#4a4038" stroke="#3a3028" stroke-width="0.8"/>
+              <rect x="2" y="12" width="15" height="12" rx="1" fill="#2a2820" opacity="0.9"/>
+              <circle cx="10" cy="42" r="6" fill="#2a2820" stroke="#5a5040" stroke-width="1.5"/>
+              <circle cx="42" cy="42" r="6" fill="#2a2820" stroke="#5a5040" stroke-width="1.5"/>
+              <rect x="28" y="6" width="4" height="13" fill="#6b4c2a"/>
+              <ellipse cx="30" cy="5" rx="8" ry="9" fill="#3a5c28" opacity="0.9"/>
+              <ellipse cx="30" cy="17" rx="7" ry="4" fill="#7a3a18" opacity="0.8"/>
+            </g>
+            <path id="truck-trail" d="M68 176 L68 176" stroke="#C0392B" stroke-width="1" stroke-dasharray="4,4" fill="none" opacity="0"/>
+            <g id="dest-pin" opacity="0">
+              <line x1="610" y1="176" x2="610" y2="154" stroke="#C0392B" stroke-width="1" stroke-dasharray="2,3"/>
+              <text x="610" y="150" text-anchor="middle" font-size="8" fill="#C0392B" font-family="Noto Sans TC">新植地點</text>
+            </g>
+          </g>
+          <rect id="tr1" x="84" y="118" width="12" height="58" rx="2" fill="#6b4c2a"/>
+          <rect id="tr2" x="214" y="120" width="12" height="56" rx="2" fill="#8a7050"/>
+          <rect id="tr3" x="344" y="120" width="12" height="56" rx="2" fill="#8a7050"/>
+          <rect id="tr4" x="474" y="120" width="12" height="56" rx="2" fill="#8a7050"/>
+          <rect id="tr5" x="604" y="120" width="12" height="56" rx="2" fill="#8a7050"/>
+          <ellipse id="cb1" cx="90" cy="98" rx="34" ry="28" fill="#3c2a18"/>
+          <ellipse id="ca1" cx="84" cy="90" rx="26" ry="23" fill="#4a3420"/>
+          <ellipse id="cc1" cx="98" cy="86" rx="22" ry="20" fill="#3e2c1a"/>
+          <ellipse id="cb2" cx="220" cy="98" rx="32" ry="27" fill="#2a5018"/>
+          <ellipse id="ca2" cx="214" cy="90" rx="25" ry="22" fill="#3a7030"/>
+          <ellipse id="cc2" cx="228" cy="86" rx="21" ry="19" fill="#306020"/>
+          <ellipse id="cb3" cx="350" cy="98" rx="32" ry="27" fill="#2a5018"/>
+          <ellipse id="ca3" cx="344" cy="90" rx="25" ry="22" fill="#3a7030"/>
+          <ellipse id="cc3" cx="358" cy="86" rx="21" ry="19" fill="#306020"/>
+          <ellipse id="cb4" cx="480" cy="98" rx="32" ry="27" fill="#2a5018"/>
+          <ellipse id="ca4" cx="474" cy="90" rx="25" ry="22" fill="#3a7030"/>
+          <ellipse id="cc4" cx="488" cy="86" rx="21" ry="19" fill="#306020"/>
+          <ellipse id="cb5" cx="610" cy="98" rx="32" ry="27" fill="#2a5018"/>
+          <ellipse id="ca5" cx="604" cy="90" rx="25" ry="22" fill="#3a7030"/>
+          <ellipse id="cc5" cx="618" cy="86" rx="21" ry="19" fill="#306020"/>
+          <line x1="71" y1="84" x2="59" y2="72" stroke="#6B5A3E" stroke-width="1.8"/>
+          <line x1="108" y1="80" x2="118" y2="70" stroke="#6B5A3E" stroke-width="1.5"/>
+          <circle id="dot1" cx="90" cy="174" r="4.5" fill="#C0392B" filter="url(#glowS)"/>
+          <circle id="dot2" cx="220" cy="174" r="4.5" fill="#C0392B" filter="url(#glowS)" opacity="0"/>
+          <circle id="dot3" cx="350" cy="174" r="4.5" fill="#C0392B" filter="url(#glowS)" opacity="0"/>
+          <circle id="dot4" cx="480" cy="174" r="4.5" fill="#C0392B" filter="url(#glowS)" opacity="0"/>
+          <circle id="dot5" cx="610" cy="174" r="4.5" fill="#C0392B" filter="url(#glowS)" opacity="0"/>
+          <text id="lb1" x="90" y="163" text-anchor="middle" font-size="8.5" fill="#E07070" font-family="Noto Sans TC" font-weight="500">路樹（染病）</text>
+          <text id="lb2" x="220" y="163" text-anchor="middle" font-size="8.5" fill="rgba(245,240,232,0.45)" font-family="Noto Sans TC">路樹 2</text>
+          <text id="lb3" x="350" y="163" text-anchor="middle" font-size="8.5" fill="rgba(245,240,232,0.45)" font-family="Noto Sans TC">路樹 3</text>
+          <text id="lb4" x="480" y="163" text-anchor="middle" font-size="8.5" fill="rgba(245,240,232,0.45)" font-family="Noto Sans TC">路樹 4</text>
+          <text id="lb5" x="610" y="163" text-anchor="middle" font-size="8.5" fill="rgba(245,240,232,0.45)" font-family="Noto Sans TC">路樹 5</text>
+          <text id="mode-bar" x="14" y="18" font-size="9.5" fill="#C9A84C" font-family="Noto Sans TC" font-weight="500" letter-spacing="1.5">根部接觸傳播</text>
+          <circle cx="582" cy="14" r="4" fill="#C0392B" opacity="0.85"/>
+          <text x="590" y="18" font-size="8" fill="rgba(245,240,232,0.45)" font-family="Noto Sans TC">感染</text>
+          <circle cx="628" cy="14" r="4" fill="#4A8A3E"/>
+          <text x="636" y="18" font-size="8" fill="rgba(245,240,232,0.45)" font-family="Noto Sans TC">健康</text>
+          <text id="hint" x="350" y="265" text-anchor="middle" font-size="8.5" fill="rgba(245,240,232,0.28)" font-family="Noto Sans TC" letter-spacing="1">點擊「下一步」觀看傳染過程</text>
+        </svg>
+        <div class="chain-caption">
+          <span class="chain-cap-step" id="cap-step">步驟 0</span>
+          <p class="chain-cap-text" id="cap-text">選擇上方傳播模式，再點擊「下一步」逐步觀看病菌如何擴散。</p>
+        </div>
+        <div class="chain-controls">
+          <button class="btn-ctrl" id="btn-next" onclick="nextStep()">下一步</button>
+          <button class="btn-ctrl" id="btn-reset" onclick="resetMode()">重置</button>
+          <div class="chain-dots" id="chain-dots"></div>
+        </div>
+      </div>
+
+      <h3 style="font-family:var(--serif);font-size:1.55rem;font-weight:700;color:var(--cream);margin:2rem 0 .7rem;line-height:1.5">褐根病初期不易發覺</h3>
+      <div class="pull" style="margin-top:1.5rem">
+        <p>鍾嘉綾表示，樹木感染不容易發現，通常發現大概都到了中、後期，不同樹種表現病徵不同，像樟樹或榕樹可以撐比較久，會逐漸出現葉子變小、變黃等等，而病徵不明顯的樹種，可能到夏季病菌比較旺盛時，就突然呈現枯死狀態。</p>
+         <p>一旦褐根病進入中後期，治療幾乎已無可能。對街道上那些被列管、但預算有限的路樹而言，生病後的選項，往往只剩移除。</p>
+        <cite>台灣大學植物病理與微生物學系系主任 鍾嘉綾</cite>
+      </div>
+    </div>
+    </div>
+  </section>
+
+  <!-- 09 TREATMENT -->
+  <section class="scene scene-accent" id="sec-p1-07">
+    <div class="prose reveal">
+      <div class="rule"></div>
+      <div class="sec-hd">
+        <span class="sec-num">06 — 感染後的選擇</span>
+        <h2 class="sec-h">感染之後，<em>幾乎只有一條路</em></h2>
+        <p class="sec-desc">技術上，褐根病有藥可醫。但在都市路樹的現實條件下，選項幾乎不存在。</p>
+      </div>
+      <div class="pull">
+        <p>「學術上已經認定這個菌在土壤裡面不會存活，邁隆是多的。目前還是到處都是，成效也不好，生態也不好。」</p>
+        <cite>臺灣植物及樹木醫學學會理事長孫岩章</cite>
+      </div>
+      <p class="body-p">一旦褐根病進入中後期，治療幾乎已無可能，鍾嘉綾表示，「除非搭配外科手術把生病的地方切掉，但這費用很高，通常只用於珍貴老樹。」</p>
+      <p class="body-p">對街道上那些被列管、但預算有限的路樹而言，生病後的選項，往往只剩移除。</p>
+      <p class="body-p">鍾嘉綾與研究團隊發現，只要將感染的木材殘體徹底挖除，土壤中其實不會殘留活菌，問題在於，廠商往往在地下根系清理不乾淨的情況下，就進行熏蒸，「如果只熏了上層50公分，底下沒清乾淨的根還是帶菌，重新種樹還是會再感染。」</p>
+      <div class="incident">
+        <p>對於褐根病防治上，鍾嘉綾在人工接種實驗理發現，「如果樹木非常健康且沒有傷口，即便放了一堆菌也不會感染」。都市樹木一方面常有小傷口，一方面生長環境差、體質衰弱，一旦感染就不容易產生防禦阻隔反應。</p>
+      </div>
+      <p class="body-p" style="font-weight:500;color:var(--cream)">褐根病不是無差別殺手，它需要一個破口，而那道破口，從究竟哪裡來？</p>
+    </div>
+  </section>
+
+  <!-- P1 CLOSING -->
+  <section class="scene scene-dark" id="sec-p1-closing">
+    <div class="closing">
+      <div class="closing-big" id="tw-main" style="min-height:4em"></div>
+      <p class="closing-body" id="tw-sub" style="min-height:2.5rem;margin-top:.5rem"></p>
+      <button onclick="readPart2()" class="next-btn" id="tw-btn"
+        style="opacity:0;pointer-events:none;transform:translateY(20px);transition:opacity .7s ease,transform .7s ease">
+        繼續閱讀第二篇：誰來修這棵樹 →
+      </button>
+    </div>
+  </section>
+
+</div><!-- /p1 -->
+
+<!-- ═══════════════════════════════════════════
+     PART 2
+═══════════════════════════════════════════ -->
+<div id="p2" class="part"><div id="p2-top"></div>
+
+  <!-- 01 CHAPTER INTRO -->
+  <section class="scene scene-dark" id="sec-p2-01">
+    <div class="chapter-intro reveal">
+      <span class="chapter-num">第二篇 — 誰來修這棵樹</span>
+      <h2 class="chapter-h">那一刀，<em>是誰做的？</em></h2>
+      <p class="chapter-lead">走在城市街頭，被截去主幹、只剩突兀枝條的行道樹並不少見，甚至被「斷頭」。陳鴻楷表示，目前台灣最常見的不當修剪，截頂（斷頭式修剪）是最嚴重的，斷頭完之後，不定芽長出來只是貼在表面，比起健康樹枝是隨心從內長到外、有「卡榫」結構，所以只要稍微長長一點，那一支就斷了，「公安怎麼造成的，這樣造成的。」這種傷害不會立刻顯現，真的斷掉可能是3年後、5年後。</p>
+    </div>
+    <div class="prose reveal" style="padding-top:0">
+      <div class="pull">
+        <p>「這其實是很危險的狀況。」不當修剪不僅會改變樹木原有的結構，使枝幹之間僅剩表層組織連結，長期下來更可能產生斷裂風險。</p>
+        <cite>大安森林之友基金會副執行長 陳鴻楷</cite>
+      </div>
+      <p class="body-p">陳鴻楷從植物生理角度解釋，樹木遭過度修剪後，葉片大量減少，光合作用能力下降，能夠製造的養分（input）減少；然而，呼吸作用全天進行，持續消耗能量（output）。在「收入減少、支出不斷」的情況下，樹木陷入能量赤字，這種現象也被稱為「飢餓現象」。</p>
+
+      <!-- PRUNING INTERACTIVE -->
+      <div class="pg-wrap">
+        <div class="pg-title">你覺得幾刀之後，樹就無法復原？</div>
+        <div class="pg-sub">按下鋸刀，看看會發生什麼事</div>
+        <div id="pg-layout" style="display:flex;flex-direction:row;align-items:flex-start;justify-content:center;gap:8px;">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding-top:60px;flex-shrink:0;width:58px;">
+            <div style="font-size:11px;color:var(--text-mid);text-align:center;line-height:1.5;">修剪<br>一刀</div>
+            <button id="pg-knife" onclick="pgCut()" aria-label="修剪一刀"
+              style="width:48px;height:48px;border-radius:50%;border:1px solid rgba(245,240,232,.22);background:rgba(245,240,232,.05);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s;">
+              <svg viewBox="0 0 52 52" width="26" height="26"><rect x="18" y="6" width="16" height="26" rx="2" fill="rgba(245,240,232,.12)" stroke="rgba(245,240,232,.72)" stroke-width="2"/><path d="M10 32 L18 32 L18 42 L10 37Z" fill="rgba(245,240,232,.2)" stroke="rgba(245,240,232,.72)" stroke-width="1.8" stroke-linejoin="round"/><path d="M34 32 L42 32 L42 37 L34 42Z" fill="rgba(245,240,232,.2)" stroke="rgba(245,240,232,.72)" stroke-width="1.8" stroke-linejoin="round"/><line x1="8" y1="32" x2="44" y2="32" stroke="rgba(245,240,232,.32)" stroke-width="1" stroke-dasharray="3,2"/></svg>
+            </button>
+          </div>
+          <div style="flex-shrink:0;">
+            <svg id="pg-svg" viewBox="0 0 220 290" width="220" height="290">
+              <rect x="96" y="200" width="28" height="88" rx="3" fill="#8B6840" id="pg-trunk"/>
+              <path d="M102 286 Q86 266 72 276" fill="none" stroke="#8B6840" stroke-width="2.5" id="pg-r1" opacity="0.6"/>
+              <path d="M110 288 Q110 268 110 285" fill="none" stroke="#8B6840" stroke-width="2.5" id="pg-r2" opacity="0.6"/>
+              <path d="M118 286 Q134 266 148 276" fill="none" stroke="#8B6840" stroke-width="2.5" id="pg-r3" opacity="0.6"/>
+              <defs><clipPath id="pgClip"><rect id="pg-clip-rect" x="0" y="0" width="220" height="290"/></clipPath></defs>
+              <g clip-path="url(#pgClip)">
+                <ellipse id="pg-co" cx="110" cy="105" rx="88" ry="100" fill="#4A8A3E" opacity="0.88"/>
+                <ellipse id="pg-ci" cx="110" cy="97" rx="58" ry="75" fill="#5A9E4E"/>
+              </g>
+              <rect id="pg-cutface" x="22" y="0" width="176" height="0" rx="2" fill="#9A6A3A" opacity="0"/>
+              <g id="pg-callus"></g>
+              <g id="pg-wounds"></g>
+              <g id="pg-dead" opacity="0">
+                <line x1="70" y1="155" x2="82" y2="167" stroke="#7A5520" stroke-width="2"/>
+                <line x1="82" y1="155" x2="70" y2="167" stroke="#7A5520" stroke-width="2"/>
+                <line x1="138" y1="152" x2="150" y2="164" stroke="#7A5520" stroke-width="2"/>
+                <line x1="150" y1="152" x2="138" y2="164" stroke="#7A5520" stroke-width="2"/>
+              </g>
+              <circle cx="192" cy="26" r="14" fill="#F0C040" opacity="0.88"/>
+              <line x1="192" y1="8" x2="192" y2="3" stroke="#F0C040" stroke-width="2"/>
+              <line x1="210" y1="26" x2="216" y2="26" stroke="#F0C040" stroke-width="2"/>
+              <line x1="174" y1="26" x2="168" y2="26" stroke="#F0C040" stroke-width="2"/>
+              <text id="pg-flash" x="110" y="162" text-anchor="middle" font-size="12" fill="#C0392B" opacity="0" font-family="sans-serif">−能量</text>
+            </svg>
+          </div>
+          <div style="flex-shrink:0;width:148px;padding-top:10px;display:flex;flex-direction:column;gap:7px;">
+            <div style="background:rgba(245,240,232,.05);padding:8px 10px;">
+              <div style="font-size:11px;color:var(--text-dim);margin-bottom:3px;">光合作用</div>
+              <div id="pg-pval" style="font-size:14px;font-weight:500;color:#4A8A3E;transition:color .4s">100%</div>
+              <div style="height:5px;background:rgba(245,240,232,.08);overflow:hidden;margin-top:5px;">
+                <div id="pg-pbar" style="height:100%;background:#4A8A3E;width:100%;transition:width .6s cubic-bezier(.4,0,.2,1),background-color .5s"></div>
+              </div>
+            </div>
+            <div style="background:rgba(245,240,232,.05);padding:8px 10px;">
+              <div style="font-size:11px;color:var(--text-dim);margin-bottom:3px;">呼吸作用</div>
+              <div style="font-size:14px;font-weight:500;color:#C0392B">100%</div>
+              <div style="height:5px;background:rgba(245,240,232,.08);overflow:hidden;margin-top:5px;">
+                <div style="height:100%;background:#C0392B;width:100%"></div>
+              </div>
+            </div>
+            <div style="background:rgba(245,240,232,.05);padding:8px 10px;">
+              <div style="font-size:11px;color:var(--text-dim);margin-bottom:3px;">能量餘額</div>
+              <div id="pg-bval" style="font-size:14px;font-weight:500;color:#5A9E4E;transition:color .4s">持平</div>
+            </div>
+            <div style="background:rgba(245,240,232,.05);padding:8px 10px;">
+              <div style="font-size:11px;color:var(--text-dim);margin-bottom:3px;">傷口癒合</div>
+              <div style="font-size:10px;display:flex;justify-content:space-between;margin-bottom:3px;">
+                <span id="pg-heal-status" style="color:var(--text-dim)">—</span>
+                <span id="pg-heal-pct" style="color:var(--text-dim)">—</span>
+              </div>
+              <div style="height:4px;background:rgba(245,240,232,.08);overflow:hidden;">
+                <div id="pg-heal-bar" style="height:100%;background:#4A8A3E;width:0%;transition:width .8s ease,background-color .4s"></div>
+              </div>
+            </div>
+            <div style="background:rgba(245,240,232,.05);padding:8px 10px;">
+              <div style="font-size:11px;color:var(--text-dim);margin-bottom:5px;">已修剪</div>
+              <div id="pg-dots" style="display:flex;gap:5px;">
+                <div class="pgd"></div><div class="pgd"></div><div class="pgd"></div><div class="pgd"></div><div class="pgd"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p id="pg-msg" style="text-align:center;font-size:13px;color:var(--text-mid);line-height:1.7;margin:14px auto 0;min-height:52px">健康狀態。葉片茂密，光合作用旺盛，能量收支平衡，根系強健。</p>
+        <button onclick="pgReset()" style="display:block;margin:10px auto 0;font-size:12px;padding:4px 16px;border:1px solid rgba(245,240,232,.15);background:transparent;color:var(--text-dim);cursor:pointer;">↺ 重新種一棵</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 FIELD VIDEO — 全版 sticky 影片 -->
+  <section id="sec-p2-02" style="position:relative;background:#080806;">
+
+    <div id="sound-hint" style="position:fixed;bottom:28px;right:28px;z-index:200;display:flex;align-items:center;gap:8px;background:rgba(8,8,6,0.82);border:1px solid var(--border-gold);padding:8px 14px;backdrop-filter:blur(8px);font-size:11px;color:var(--gold);letter-spacing:.08em;font-family:var(--sans);opacity:0;transition:opacity .5s ease;pointer-events:none;">
+      <span id="sound-icon">🔊</span><span id="sound-text">鏈鋸聲音效</span>
+    </div>
+
+    <!-- sticky 全版影片 -->
+    <div style="position:sticky;top:0;height:calc(var(--vh,1vh)*100);width:100%;overflow:hidden;z-index:1;">
+      <div id="field-video" style="position:absolute;inset:0;width:100%;height:100%;overflow:hidden;filter:saturate(0.7) brightness(0.55);pointer-events:none;">
+        <div id="field-yt-cover" style="position:absolute;inset:0;background:#060604;z-index:1;transition:opacity 1.2s ease;pointer-events:none;"></div>
+        <iframe id="field-video-iframe" src="https://www.youtube.com/embed/j7-U3c_pqBk?autoplay=1&mute=1&loop=1&playlist=j7-U3c_pqBk&controls=0&rel=0&modestbranding=1&playsinline=1&enablejsapi=1"
+          style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:177.78vh;height:100vh;min-width:100%;min-height:56.25vw;"
+          frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
+      </div>
+      <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(8,8,6,0.25) 0%,rgba(8,8,6,0.15) 40%,rgba(8,8,6,0.8) 100%);pointer-events:none;"></div>
+      <!-- 標題左下角 -->
+      <div id="pruning-intro-text" style="position:absolute;bottom:12vh;left:5vw;opacity:0;transform:translateY(24px);transition:opacity .8s ease,transform .8s ease;">
+        <div style="font-size:9px;letter-spacing:.5em;color:var(--gold);margin-bottom:12px;font-family:var(--sans)">02 — 現場直擊</div>
+        <h2 style="font-family:var(--serif);font-size:clamp(2rem,5vw,4.5rem);font-weight:900;color:var(--cream);line-height:1.15;margin-bottom:16px;">防汛期前的<em style="color:var(--gold);font-style:normal">年度修剪</em></h2>
+        <p style="font-size:clamp(13px,1.6vw,16px);color:rgba(245,240,232,0.6);font-weight:300;max-width:560px;line-height:1.9;">記者實地走訪士林區現場，看見修樹人員操作吊籠，鏈鋸聲響起。</p>
+      </div>
+      <!-- 淡出遮罩 -->
+      <div id="video-fade-overlay" style="position:absolute;inset:0;background:#080806;opacity:0;pointer-events:none;z-index:3;transition:opacity 1.2s ease;"></div>
+      <div style="position:absolute;bottom:20px;left:5vw;z-index:4;font-size:10px;color:rgba(245,240,232,0.25);letter-spacing:.03em;">攝影：張耀銘</div>
+    </div>
+
+    <!-- scroll driver：80vh 停留 → 兩張字卡 -->
+    <div style="position:relative;margin-top:-100vh;z-index:2;pointer-events:none;">
+      <div style="height:80vh;"></div>
+
+      <div class="sc-r">
+        <div class="step-card" data-pruning="0" style="pointer-events:auto;max-width:480px;">
+          <span class="s-num">02 — 現場直擊</span>
+          <h3>防汛期將至，<em>修樹人員上場</em></h3>
+          <p>台北市行道樹陸續展開年度「全樹型修剪」，記者實地走訪士林區現場，看見修樹人員操作吊籠，修剪預防樹倒的鏈鋸聲響起。</p>
+        </div>
+      </div>
+
+      <div class="sc-l">
+        <div class="step-card" data-pruning="1" style="pointer-events:auto;max-width:480px;">
+          <span class="s-num">樹藝師說</span>
+          <h3>「定期且正確的修剪，<em>有助降低倒伏風險</em>」</h3>
+          <div style="margin-top:1rem;font-size:11px;color:var(--text-dim);border-top:1px solid var(--border);padding-top:.8rem;display:flex;justify-content:space-between;">
+            <span>東昕環境工程有限公司樹藝師林辰如</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="sc-r">
+        <div class="step-card" data-pruning="2" style="pointer-events:auto;max-width:560px;">
+          <span class="s-num">修樹前的準備</span>
+          <h3>專業評估，<em>才能動刀</em></h3>
+          <p>林辰如表示，修樹前會先由園藝技術師及樹藝師到場先評估，之後由擁有修剪證照的工班人員進行修剪。</p>
+          <div style="margin-top:1.1rem;background:var(--gold-glow);border:1px solid var(--border-gold);padding:.9rem 1.1rem;font-size:12.5px;color:var(--text-mid);line-height:1.85;border-left:3px solid var(--gold);">
+            <span style="font-size:9px;letter-spacing:.2em;color:var(--gold);display:block;margin-bottom:.35rem">樹藝師說</span>
+            「樹不容易長回來，因此每一刀都必須格外小心。」
+          </div>
+        </div>
+      </div>
+
+      <div class="sc-l">
+        <div class="step-card" data-pruning="3" style="pointer-events:auto;max-width:560px;">
+          <span class="s-num">修樹人員的養成</span>
+          <h3>從地面開始，<em>一步一步上樹</em></h3>
+          <p>看似簡單的修樹工作，實際上每一個環節都涉及專業技術與嚴格訓練。林辰如表示，修樹人員的養成，通常從地面作業開始，新人需先負責整理枝條，逐步熟悉流程，並通過層層考核後，才有機會進一步上樹訓練。</p>
+        </div>
+      </div>
+
+      <!-- 淡出觸發點 -->
+      <div id="video-fade-trigger" style="height:1px;visibility:hidden;"></div>
+
+      <div style="height:50vh;"></div>
+    </div>
+  </section>
+
+  <!-- 03 SOP — sticky scroll, 5 steps -->
+  <section id="sec-p2-03" style="position:relative;background:#0f0f0a;">
+
+    <!-- STICKY: tree viz + step indicator -->
+    <div style="position:sticky;top:0;height:calc(var(--vh,1vh)*100);width:100%;display:flex;align-items:center;justify-content:center;z-index:1;overflow:hidden;">
+      <div style="position:absolute;inset:0;background:radial-gradient(ellipse 70% 80% at 55% 50%,#111208 0%,#0a0a06 100%)"></div>
+
+      <!-- step dots top-left -->
+      <div id="sop-dots-row" style="position:absolute;top:28px;left:20vw;display:flex;gap:10px;align-items:center;">
+        <div id="sopd-0" class="sop-sdot on"></div>
+        <div id="sopd-1" class="sop-sdot"></div>
+        <div id="sopd-2" class="sop-sdot"></div>
+        <div id="sopd-3" class="sop-sdot"></div>
+        <div id="sopd-4" class="sop-sdot"></div>
+        <span id="sop-sdot-label" style="font-size:10px;letter-spacing:.3em;color:var(--gold);margin-left:8px;font-family:var(--sans)">0 — 評估</span>
+      </div>
+
+      <!-- section label top-right -->
+      <div style="position:absolute;top:28px;right:5vw;font-size:9px;letter-spacing:.45em;color:var(--text-dim);font-family:var(--sans)">03 — 修剪 SOP</div>
+
+      <!-- big step number watermark -->
+      <div id="sop-bignum" style="position:absolute;right:6vw;bottom:10vh;font-family:var(--serif);font-size:clamp(8rem,18vw,18rem);font-weight:900;color:rgba(201,168,76,0.05);line-height:1;pointer-events:none;transition:opacity .4s;user-select:none">0</div>
+
+      <!-- tree SVG (changes per step) -->
+      <div id="sop-viz-stage" style="position:relative;z-index:2;display:flex;align-items:center;justify-content:center;">
+        <!-- step 0 -->
+        <svg id="sop-v0" class="sop-vsvg active" viewBox="0 0 220 320" width="min(38vw,320px)" height="auto">
+          <rect x="100" y="188" width="20" height="130" rx="3" fill="#7A5C2E" opacity="0.75"/>
+          <ellipse cx="110" cy="130" rx="72" ry="90" fill="#4A8A3E" opacity="0.9"/>
+          <ellipse cx="110" cy="122" rx="48" ry="68" fill="#5A9E4E" opacity="0.8"/>
+          <circle cx="110" cy="142" r="46" fill="none" stroke="rgba(201,168,76,.65)" stroke-width="1.8" stroke-dasharray="6,4"/>
+          <text x="110" y="290" text-anchor="middle" font-size="13" fill="rgba(245,240,232,.4)" font-family="Noto Sans TC">評估中</text>
+        </svg>
+        <!-- step 1 -->
+        <svg id="sop-v1" class="sop-vsvg" viewBox="0 0 220 320" width="min(38vw,320px)" height="auto">
+          <rect x="100" y="188" width="20" height="130" rx="3" fill="#7A5C2E" opacity="0.75"/>
+          <ellipse cx="110" cy="130" rx="72" ry="90" fill="#4A8A3E" opacity="0.9"/>
+          <line x1="110" y1="58" x2="68" y2="22" stroke="#8B4513" stroke-width="3.5" opacity="0.85"/>
+          <line x1="110" y1="70" x2="158" y2="38" stroke="#8B4513" stroke-width="3" opacity="0.75"/>
+          <text x="62" y="20" font-size="18" fill="#C0392B" font-weight="900" font-family="sans-serif">✕</text>
+          <text x="152" y="37" font-size="16" fill="#C0392B" font-weight="900" font-family="sans-serif">✕</text>
+          <text x="110" y="290" text-anchor="middle" font-size="13" fill="rgba(245,240,232,.4)" font-family="Noto Sans TC">標記不良枝</text>
+        </svg>
+        <!-- step 2 -->
+        <svg id="sop-v2" class="sop-vsvg" viewBox="0 0 220 320" width="min(38vw,320px)" height="auto">
+          <rect x="100" y="188" width="20" height="130" rx="3" fill="#7A5C2E" opacity="0.75"/>
+          <ellipse cx="110" cy="130" rx="72" ry="90" fill="#4A8A3E" opacity="0.9"/>
+          <line x1="14" y1="96" x2="206" y2="96" stroke="rgba(201,168,76,.55)" stroke-width="2" stroke-dasharray="7,4"/>
+          <line x1="14" y1="118" x2="206" y2="118" stroke="rgba(201,168,76,.4)" stroke-width="1.5" stroke-dasharray="5,4"/>
+          <line x1="110" y1="14" x2="110" y2="68" stroke="rgba(201,168,76,.7)" stroke-width="2" stroke-dasharray="4,4"/>
+          <text x="110" y="290" text-anchor="middle" font-size="13" fill="rgba(245,240,232,.4)" font-family="Noto Sans TC">疏剪後通風透光</text>
+        </svg>
+        <!-- step 3 -->
+        <svg id="sop-v3" class="sop-vsvg" viewBox="0 0 220 320" width="min(38vw,320px)" height="auto">
+          <ellipse cx="110" cy="126" rx="72" ry="90" fill="#3A6A2E" opacity="0.25" stroke="rgba(245,240,232,.12)" stroke-width="1.5" stroke-dasharray="5,4"/>
+          <rect x="100" y="188" width="20" height="130" rx="3" fill="#7A5C2E" opacity="0.75"/>
+          <ellipse cx="110" cy="136" rx="52" ry="70" fill="#4A8A3E" opacity="0.92"/>
+          <line x1="34" y1="78" x2="186" y2="78" stroke="#C0392B" stroke-width="2" stroke-dasharray="6,4" opacity="0.75"/>
+          <text x="190" y="82" font-size="11" fill="rgba(192,57,43,.7)" font-family="sans-serif">←截</text>
+          <text x="110" y="290" text-anchor="middle" font-size="13" fill="rgba(245,240,232,.4)" font-family="Noto Sans TC">縮減樹幅與樹高</text>
+        </svg>
+        <!-- step 4 -->
+        <svg id="sop-v4" class="sop-vsvg" viewBox="0 0 220 320" width="min(38vw,320px)" height="auto">
+          <rect x="100" y="188" width="20" height="130" rx="3" fill="#7A5C2E" opacity="0.75"/>
+          <ellipse cx="110" cy="128" rx="54" ry="72" fill="#5A9A4E" opacity="0.92"/>
+          <circle cx="110" cy="130" r="28" fill="rgba(48,100,48,.45)" stroke="rgba(100,200,100,.55)" stroke-width="2"/>
+          <text x="110" y="138" text-anchor="middle" font-size="26" fill="rgba(160,240,160,.9)" font-family="sans-serif">✓</text>
+          <text x="110" y="290" text-anchor="middle" font-size="13" fill="rgba(245,240,232,.4)" font-family="Noto Sans TC">修剪完成</text>
+        </svg>
+      </div>
+    </div>
+
+    <!-- SCROLL DRIVER -->
+    <div style="position:relative;margin-top:-100vh;z-index:2;pointer-events:none;">
+
+      <!-- step 0 -->
+      <div class="sc-r">
+        <div class="step-card sop-sc" data-sop="0" style="pointer-events:auto;max-width:480px;">
+          <span class="s-num">03 — 修剪 SOP</span>
+          <h3>動刀之前，<em>先讀懂這棵樹</em></h3>
+          <p>修剪前的評估是最關鍵的一步。樹藝師與園藝技術師會到場觀察樹的整體狀況，評估完成後才能決定下刀的位置。</p>
+          <div style="margin-top:1rem;background:var(--gold-glow);border:1px solid var(--border-gold);padding:.8rem 1rem;font-size:12px;color:var(--text-mid);line-height:1.8">
+            <span style="font-size:9px;letter-spacing:.2em;color:var(--gold);display:block;margin-bottom:.3rem">樹藝師說</span>
+            評估完成後，才能決定這棵樹需要哪些步驟、下刀的位置。
+          </div>
+        </div>
+      </div>
+
+      <!-- step 1 -->
+      <div class="sc-l">
+        <div class="step-card sop-sc" data-sop="1" style="pointer-events:auto;max-width:480px;">
+          <span class="s-num">步驟一</span>
+          <h3>清除<em>不良枝</em></h3>
+          <p>優先處理枯枝、斷枝和病蟲害（上面有腐朽）。</p>
+          <div style="margin-top:1rem;background:var(--gold-glow);border:1px solid var(--border-gold);padding:.8rem 1rem;font-size:12px;color:var(--text-mid);line-height:1.8">
+            <span style="font-size:9px;letter-spacing:.2em;color:var(--gold);display:block;margin-bottom:.3rem">樹藝師說</span>
+            這一步不只是清理，也是在診斷，哪些枝條已經死亡、哪些有病蟲害跡象。
+          </div>
+        </div>
+      </div>
+
+      <!-- step 2 -->
+      <div class="sc-r">
+        <div class="step-card sop-sc" data-sop="2" style="pointer-events:auto;max-width:480px;">
+          <span class="s-num">步驟二</span>
+          <h3>樹冠<em>疏剪</em></h3>
+          <p>目的是讓光線能透進來，保持通風。良好的通風可以降低病蟲害發生的機率。</p>
+          <div style="margin-top:1rem;background:var(--gold-glow);border:1px solid var(--border-gold);padding:.8rem 1rem;font-size:12px;color:var(--text-mid);line-height:1.8">
+            <span style="font-size:9px;letter-spacing:.2em;color:var(--gold);display:block;margin-bottom:.3rem">樹藝師說</span>
+            疏剪是在樹冠的「內部」操作，去除過密的枝條，不改變整體外形。
+          </div>
+        </div>
+      </div>
+
+      <!-- step 3 -->
+      <div class="sc-l">
+        <div class="step-card sop-sc" data-sop="3" style="pointer-events:auto;max-width:480px;">
+          <span class="s-num">步驟三</span>
+          <h3>樹冠<em>截剪</em></h3>
+          <p>讓樹幅變窄、樹高降低。截剪是對樹的外形進行整體性縮減，每個截剪位置都必須謹慎判斷。</p>
+          <div style="margin-top:1rem;background:var(--gold-glow);border:1px solid var(--border-gold);padding:.8rem 1rem;font-size:12px;color:var(--text-mid);line-height:1.8">
+            <span style="font-size:9px;letter-spacing:.2em;color:var(--gold);display:block;margin-bottom:.3rem">樹藝師說</span>
+            「樹不容易長回來，因此每一刀都必須格外小心。」
+          </div>
+        </div>
+      </div>
+
+      <!-- step 4 -->
+      <div class="sc-r">
+        <div class="step-card sop-sc" data-sop="4" style="pointer-events:auto;max-width:480px;">
+          <span class="s-num">完成</span>
+          <h3>收整清理，<em>確認完工</em></h3>
+          <p>做完截剪後，再進行一次整體的樹冠清理，確認沒有遺漏的不良枝條。</p>
+          <div style="margin-top:1rem;background:var(--gold-glow);border:1px solid var(--border-gold);padding:.8rem 1rem;font-size:12px;color:var(--text-mid);line-height:1.8">
+            <span style="font-size:9px;letter-spacing:.2em;color:var(--gold);display:block;margin-bottom:.3rem">樹藝師說</span>
+            這行學問真的很多，很多細節是沒辦法直接透過考試學到，必須在現場累積經驗。
+          </div>
+        </div>
+      </div>
+
+      <!-- trailing -->
+      <div style="height:50vh;"></div>
+    </div>
+
+    <style>
+    .sop-vsvg{display:none;transition:opacity .4s}
+    .sop-vsvg.active{display:block}
+    .sop-sdot{width:7px;height:7px;border-radius:50%;background:rgba(245,240,232,.15);border:1px solid rgba(245,240,232,.2);transition:all .3s;flex-shrink:0}
+    .sop-sdot.on{background:var(--gold);border-color:var(--gold);transform:scale(1.3)}
+    .sop-sdot.done{background:rgba(201,168,76,.4);border-color:rgba(201,168,76,.35)}
+    </style>
+
+  </section>
+
+  <!-- 三段修剪法 sticky scroll -->
+  <section id="sec-three-cut" style="position:relative;background:#0a0a06;border-top:1px solid var(--border-gold);">
+    <div style="position:sticky;top:0;height:calc(var(--vh,1vh)*100);width:100%;display:flex;align-items:center;justify-content:center;z-index:1;overflow:hidden;">
+      <div style="position:absolute;inset:0;background:radial-gradient(ellipse 60% 70% at 65% 50%,#111208 0%,#0a0a06 100%)"></div>
+      <div style="position:absolute;top:28px;left:20vw;display:flex;gap:10px;align-items:center;z-index:3;">
+        <div id="tcd-0" class="tc-dot" style="background:rgba(201,168,76,.25);border-color:rgba(201,168,76,.25)"></div>
+        <div id="tcd-1" class="tc-dot" style="background:rgba(192,100,80,.2);border-color:rgba(192,100,80,.2)"></div>
+        <div id="tcd-2" class="tc-dot" style="background:rgba(100,180,100,.2);border-color:rgba(100,180,100,.2)"></div>
+        <span id="tc-dot-lbl" style="font-size:10px;letter-spacing:.3em;color:var(--gold);margin-left:8px;font-family:var(--sans)">延伸說明 — 三段修剪法</span>
+      </div>
+      <div style="position:absolute;top:28px;right:5vw;font-size:9px;letter-spacing:.45em;color:var(--text-dim);font-family:var(--sans)">大於5公分枝幹適用</div>
+      <svg id="tc-svg" viewBox="0 0 420 320" width="min(50vw,480px)" height="auto" style="position:relative;z-index:2;">
+        <rect x="30" y="20" width="90" height="280" rx="8" fill="#3a2a1a" stroke="rgba(139,100,60,0.5)" stroke-width="1.5"/>
+        <line x1="48" y1="40" x2="48" y2="280" stroke="rgba(139,100,60,0.18)" stroke-width="1.2"/>
+        <line x1="68" y1="30" x2="68" y2="285" stroke="rgba(139,100,60,0.12)" stroke-width="1.2"/>
+        <line x1="88" y1="35" x2="88" y2="280" stroke="rgba(139,100,60,0.15)" stroke-width="1.2"/>
+        <path d="M120 138 Q140 115 158 128 Q140 152 120 158Z" fill="rgba(100,70,30,0.65)" stroke="rgba(201,168,76,0.4)" stroke-width="1.2"/>
+        <text x="165" y="148" font-size="10" fill="rgba(201,168,76,0.55)" font-family="Noto Sans TC">枝領</text>
+        <path d="M120 136 Q142 110 185 98" stroke="rgba(201,168,76,0.35)" stroke-width="1" fill="none" stroke-dasharray="3,2"/>
+        <text x="188" y="95" font-size="10" fill="rgba(245,240,232,0.3)" font-family="Noto Sans TC">枝皮脊</text>
+        <path d="M120 136 L390 86 L390 112 L120 162Z" fill="#2a1c0c" stroke="rgba(139,100,60,0.45)" stroke-width="1.2"/>
+        <line x1="155" y1="128" x2="370" y2="92" stroke="rgba(139,100,60,0.12)" stroke-width="1"/>
+        <line x1="155" y1="145" x2="370" y2="108" stroke="rgba(139,100,60,0.1)" stroke-width="1"/>
+        <path d="M120 136 L215 121 L220 138 L120 162Z" id="tc-stub" fill="rgba(50,32,14,0.9)" stroke="rgba(139,100,60,0.35)" stroke-width="1" opacity="0"/>
+        <g id="tc-cut1" opacity="0.22" style="transition:opacity .5s">
+          <line x1="210" y1="152" x2="220" y2="120" stroke="#C9A84C" stroke-width="3" stroke-linecap="round"/>
+          <circle cx="215" cy="136" r="14" fill="rgba(201,168,76,0.12)" stroke="#C9A84C" stroke-width="2"/>
+          <text x="215" y="141" text-anchor="middle" font-size="14" font-weight="700" fill="#C9A84C" font-family="sans-serif">①</text>
+          <line x1="232" y1="168" x2="218" y2="150" stroke="rgba(201,168,76,0.5)" stroke-width="1" stroke-dasharray="3,2"/>
+          <text x="236" y="176" font-size="10" fill="rgba(201,168,76,0.6)" font-family="Noto Sans TC">枝底切</text>
+        </g>
+        <g id="tc-cut2" opacity="0.22" style="transition:opacity .5s">
+          <line x1="238" y1="100" x2="248" y2="132" stroke="#e07060" stroke-width="3" stroke-linecap="round"/>
+          <circle cx="243" cy="116" r="14" fill="rgba(192,80,60,0.12)" stroke="#e07060" stroke-width="2"/>
+          <text x="243" y="121" text-anchor="middle" font-size="14" font-weight="700" fill="#e07060" font-family="sans-serif">②</text>
+          <line x1="260" y1="98" x2="250" y2="108" stroke="rgba(192,80,60,0.5)" stroke-width="1" stroke-dasharray="3,2"/>
+          <text x="264" y="95" font-size="10" fill="rgba(192,80,60,0.6)" font-family="Noto Sans TC">切除枝體</text>
+        </g>
+        <g id="tc-cut3" opacity="0.22" style="transition:opacity .5s">
+          <line x1="124" y1="134" x2="132" y2="162" stroke="#7ab87a" stroke-width="3.5" stroke-linecap="round"/>
+          <circle cx="128" cy="148" r="15" fill="rgba(80,160,80,0.1)" stroke="#7ab87a" stroke-width="2"/>
+          <text x="128" y="153" text-anchor="middle" font-size="14" font-weight="700" fill="#7ab87a" font-family="sans-serif">③</text>
+          <line x1="88" y1="185" x2="116" y2="162" stroke="rgba(80,160,80,0.5)" stroke-width="1" stroke-dasharray="3,2"/>
+          <text x="36" y="195" font-size="10" fill="rgba(80,160,80,0.6)" font-family="Noto Sans TC">枝領外緣切</text>
+          <ellipse id="tc-wound" cx="126" cy="148" rx="6" ry="16" fill="rgba(80,50,20,0)" stroke="rgba(201,168,76,0)" stroke-width="1" style="transition:all .6s"/>
+        </g>
+        <line x1="120" y1="298" x2="390" y2="298" stroke="rgba(245,240,232,0.1)" stroke-width="1"/>
+        <line x1="120" y1="293" x2="120" y2="303" stroke="rgba(245,240,232,0.1)" stroke-width="1"/>
+        <line x1="390" y1="293" x2="390" y2="303" stroke="rgba(245,240,232,0.1)" stroke-width="1"/>
+        <text x="255" y="314" text-anchor="middle" font-size="9" fill="rgba(245,240,232,0.2)" font-family="Noto Sans TC">枝幹直徑 ＞ 5 公分</text>
+      </svg>
+      <div id="tc-bignum" style="position:absolute;right:5vw;bottom:10vh;font-family:var(--serif);font-size:clamp(7rem,16vw,16rem);font-weight:900;color:rgba(201,168,76,0.04);line-height:1;pointer-events:none;transition:all .5s;user-select:none">①</div>
+    </div>
+    <div style="position:relative;margin-top:-100vh;z-index:2;pointer-events:none;">
+      <div class="sc-r">
+        <div class="step-card tc-sc" data-tc="-1" style="pointer-events:auto;max-width:480px;">
+          <span class="s-num">延伸說明 — 三段修剪法</span>
+          <h3>大於5公分枝幹<br><em>必行三段修剪法</em></h3>
+          <p>正確的三段切法製造適當切口，<strong>避免撕裂樹皮</strong>。一旦樹皮大面積剝落，傷口難以癒合。捲動觀看每一刀的位置與原因。</p>
+        </div>
+      </div>
+      <div class="sc-l">
+        <div class="step-card tc-sc" data-tc="0" style="pointer-events:auto;max-width:480px;border-color:rgba(201,168,76,0.35);">
+          <span class="s-num" style="color:var(--gold)">第一鋸</span>
+          <h3><em style="color:var(--gold)">枝底切</em></h3>
+          <p>從枝幹<strong>下方</strong>先鋸一刀，採用枝底切法，以防扯脫樹皮。</p>
+          <div style="margin-top:1rem;background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.2);padding:.8rem 1rem;font-size:12px;color:var(--text-mid);line-height:1.8">
+            <span style="font-size:9px;letter-spacing:.2em;color:var(--gold);display:block;margin-bottom:.3rem">為什麼要這一刀</span>
+            若省略枝底切，上方切割時重量會把樹皮往下撕扯，留下不規則大傷口，大幅增加感染機率。
+          </div>
+        </div>
+      </div>
+      <div class="sc-r">
+        <div class="step-card tc-sc" data-tc="1" style="pointer-events:auto;max-width:480px;border-color:rgba(192,100,80,0.35);">
+          <span class="s-num" style="color:#e07060">第二鋸</span>
+          <h3><em style="color:#e07060">切除枝體</em></h3>
+          <p>在第一鋸<strong>外側</strong>從上方鋸斷；由2的位置往下切到樹枝斷落。</p>
+        </div>
+      </div>
+      <div class="sc-l">
+        <div class="step-card tc-sc" data-tc="2" style="pointer-events:auto;max-width:480px;border-color:rgba(100,180,100,0.35);">
+          <span class="s-num" style="color:#7ab87a">第三鋸</span>
+          <h3><em style="color:#7ab87a">枝領外緣切</em></h3>
+          <p>沿<strong>枝領外緣</strong>切除殘留枝柄。枝領是樹幹組織與枝條組織的交界防禦帶，保留它，樹木才能啟動癒合機制，形成癒傷組織覆蓋傷口、阻絕病菌。</p>
+          <div style="margin-top:1rem;background:rgba(100,180,100,0.05);border:1px solid rgba(100,180,100,0.2);padding:.8rem 1rem;font-size:12px;color:var(--text-mid);line-height:1.8">
+            <span style="font-size:9px;letter-spacing:.2em;color:#7ab87a;display:block;margin-bottom:.3rem">為什麼要這一刀</span>
+            正確切法之後，傷口會逐漸癒合包覆，會形成Donut甜甜圈形狀。
+          </div>
+        </div>
+      </div>
+      <div style="height:50vh;"></div>
+    </div>
+  </section>
+
+  <!-- 04 MGMT SYSTEM -->
+  <section class="scene scene-dark" id="sec-p2-04">
+    <div class="prose reveal">
+      <div class="rule"></div>
+      <div class="sec-hd">
+        <span class="sec-num">04 — 樹木管理制度</span>
+        <h2 class="sec-h">誰來守護城市的樹？<br><em>管理制度的長路</em></h2>
+      </div>
+      <p class="body-p">修剪之外，「健檢」對樹木風險預估來說也非常重要，林辰如表示，會配合儀器和採樣檢測，把懷疑患病的地方挖深一點，取根部15公分送林試所檢驗，運用「應力波儀器」聲波原理偵測樹幹內部有沒有空洞。</p>
+      <p class="body-p">業界目前使用「應力波」儀器來去偵測有無樹洞，鍾嘉綾表示，在樹幹周圍打入感測器，透過敲擊時聲音的傳導速度，判斷樹幹內部是否有空洞或腐朽，木質緊密傳導就快，腐朽了傳導就慢，最終畫出斷面圖，評估倒塌風險。</p>
+      <p class="body-p">但即使是專業的巡檢人員，也不一定能百分之百判斷正確，鍾嘉綾表示，「大部分是目視評估，不會去挖根，所以的確可能誤判，」例如，褐根病典型的「網紋狀」病徵，其實其他腐朽菌也可能出現，肉眼難以區分，真正確診，需要送林業試驗所或各大學的植物教學醫院，進行培養與檢測。</p>
+      <p class="body-p">根據監察院113年路樹調查報告指出，路樹巡檢標準化作業程序與執行人員具備相當類科技師證書或專業能力，是路樹養護品質的關鍵。可怕的是，僅11個縣市政府建立例行性巡檢作業標準程序。</p>
+      <div id="crt" style="padding:1.5rem 0">
+        <p class="crt-title">全國22縣市路樹管理制度完備度</p>
+        <p class="crt-sub">資料期間：108–112年　點擊長條查看縣市明細</p>
+        <div class="crt-chart" id="crt-chart"></div>
+        <div class="crt-legend">
+          <div class="crt-leg-item"><div class="crt-leg-dot" style="background:rgba(74,138,62,.8)"></div>已建立</div>
+          <div class="crt-leg-item"><div class="crt-leg-dot" style="background:rgba(192,57,43,.75)"></div>尚未建立</div>
+        </div>
+        <div class="crt-detail" id="crt-detail"><p class="crt-hint">點擊上方長條，查看各縣市狀況</p></div>
+        <p class="crt-source">資料來源：監察院113年路樹管理調查報告　製圖：張耀銘</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 05 CERT -->
+  <!-- TIMELINE STICKY SEQUENCE -->
+  <!-- ── TIMELINE: two-column layout ── -->
+  <!-- LEFT: scroll steps (cards) | RIGHT: sticky timeline -->
+  <section id="sec-p2-05" style="position:relative;background:#0e0e09;">
+
+    <div style="display:flex;max-width:1200px;margin:0 auto;min-height:calc(var(--vh,1vh)*100);">
+
+      <!-- LEFT COLUMN: scrolling cards -->
+      <div id="tl-cards-col" style="flex:0 0 580px;max-width:580px;padding:80px 48px 120px 160px;display:flex;flex-direction:column;gap:0;position:relative;z-index:2;">
+
+        <!-- section header -->
+        <div style="margin-bottom:56px;">
+          <span class="sec-num">05 — 「樹」業有專攻</span>
+          <h2 class="sec-h" style="margin-top:.5rem">延滯10年<br><em>認證制度上路</em></h2>
+          <p class="sec-desc">從法律授權到制度落地，台灣走了整整11年。</p>
+        </div>
+
+        <!-- cards -->
+        <div class="tl-card" data-tl="0" style="margin-bottom:80px;opacity:.35;transition:opacity .4s">
+          <div style="font-size:10px;letter-spacing:.3em;color:var(--gold);margin-bottom:10px;font-family:var(--sans)">2015 / 07</div>
+          <h3 style="font-family:var(--serif);font-size:1.55rem;font-weight:700;color:var(--cream);margin-bottom:.7rem;line-height:1.3">法律授權已備</h3>
+          <p style="font-size:15px;line-height:2;color:var(--text-mid)">森林法修正，<strong style="color:var(--text)">明確授權建立樹木保護專業人員培訓考選及認證制度</strong>。制度的法源基礎已在，但接下來10年，幾乎什麼都沒有發生。</p>
+        </div>
+
+        <div class="tl-card" data-tl="1" style="margin-bottom:80px;opacity:.35;transition:opacity .4s">
+          <div style="font-size:10px;letter-spacing:.3em;color:var(--gold);margin-bottom:10px;font-family:var(--sans)">2016 / 05</div>
+          <h3 style="font-family:var(--serif);font-size:1.55rem;font-weight:700;color:var(--cream);margin-bottom:.7rem;line-height:1.3">普查辦法上路</h3>
+          <p style="font-size:15px;line-height:2;color:var(--text-mid)">樹木普查方法發布施行，是少數具體推進的配套措施。但<strong style="color:var(--text)">認證制度本身仍付之闕如</strong>，養護品質參差不齊的問題持續累積。</p>
+        </div>
+
+        <div class="tl-card" data-tl="2" style="margin-bottom:80px;opacity:.35;transition:opacity .4s">
+          <div style="font-size:10px;letter-spacing:.3em;color:rgba(160,120,60,0.9);margin-bottom:10px;font-family:var(--sans)">2015 — 2025</div>
+          <h3 style="font-family:var(--serif);font-size:1.55rem;font-weight:700;color:var(--cream);margin-bottom:.7rem;line-height:1.3">十年的空白</h3>
+          <p style="font-size:15px;line-height:2;color:var(--text-mid)">台灣沒有官方認證的樹木保護人員制度。民間只能依賴 ISA 考試，<strong style="color:var(--text)">城市中的路樹，就在這樣的空白中被修剪、被種下、被移除。</strong></p>
+        </div>
+
+        <div class="tl-card" data-tl="3" style="margin-bottom:80px;opacity:.35;transition:opacity .4s">
+          <div style="font-size:10px;letter-spacing:.3em;color:rgba(192,57,43,0.9);margin-bottom:10px;font-family:var(--sans)">2024 / 10</div>
+          <h3 style="font-family:var(--serif);font-size:1.55rem;font-weight:700;color:var(--cream);margin-bottom:.7rem;line-height:1.3">逢甲事件</h3>
+          <p style="font-size:15px;line-height:2;color:var(--text-mid)">逢甲大學榕樹無預警倒塌，<strong style="color:var(--text)">壓死一名碩士生</strong>。事件引發輿論對路樹管理制度的強烈質疑，也讓長年被忽視的認證問題浮上檯面。</p>
+        </div>
+
+        <div class="tl-card" data-tl="4" style="margin-bottom:80px;opacity:.35;transition:opacity .4s">
+          <div style="font-size:10px;letter-spacing:.3em;color:var(--gold);margin-bottom:10px;font-family:var(--sans)">2025 / 04</div>
+          <h3 style="font-family:var(--serif);font-size:1.55rem;font-weight:700;color:var(--cream);margin-bottom:.7rem;line-height:1.3">預告終於來了</h3>
+          <p style="font-size:15px;line-height:2;color:var(--text-mid)">農業部預告《樹木保護專業人員考選培訓及分級認證辦法》，<strong style="color:var(--text)">距離法律授權，已過了整整10年</strong>。</p>
+        </div>
+
+        <div class="tl-card" data-tl="5" style="margin-bottom:40px;opacity:.35;transition:opacity .4s">
+          <div style="font-size:10px;letter-spacing:.3em;color:var(--gold);margin-bottom:10px;font-family:var(--sans)">2026 / 04</div>
+          <h3 style="font-family:var(--serif);font-size:1.55rem;font-weight:700;color:var(--cream);margin-bottom:.7rem;line-height:1.3">認證制度正式上路</h3>
+          <p style="font-size:15px;line-height:2;color:var(--text-mid)">認證辦法正式發布，台灣路樹管理邁入「證照化」時代。制度分為<strong style="color:var(--text)">初、中、高三個等級</strong>，這只是一個開始。</p>
+          <div style="margin-top:1.2rem;display:flex;flex-direction:column;gap:6px;">
+            <div style="background:rgba(139,69,19,0.12);border:1px solid rgba(139,69,19,0.35);padding:9px 13px;"><div style="font-size:9px;letter-spacing:.1em;color:#c8844a;margin-bottom:3px">初級</div><div style="font-size:12px;color:var(--cream);font-weight:500">現場操作・樹木保護施工</div></div>
+            <div style="background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.25);padding:9px 13px;"><div style="font-size:9px;letter-spacing:.1em;color:var(--gold);margin-bottom:3px">中級</div><div style="font-size:12px;color:var(--cream);font-weight:500">修剪、養護・健康調查與規劃</div></div>
+            <div style="background:rgba(192,57,43,0.08);border:1px solid rgba(192,57,43,0.28);padding:9px 13px;"><div style="font-size:9px;letter-spacing:.1em;color:#e07070;margin-bottom:3px">高級</div><div style="font-size:12px;color:var(--cream);font-weight:500">移植復育・疫病蟲害防治</div></div>
+          </div>
+        </div>
+
+        <div class="pull" style="margin-top:1rem;width:100%">
+          <p>若核發的證照缺乏實質的技術水平考核，若認證機制無法提升基層的專業觀念與技術水準，即便持有證照，怕是只是無法發揮核發執照的用意。</p>
+          <cite>陳鴻楷</cite>
+        </div>
+
+        <div class="pull" style="margin-top:1rem;width:100%">
+          <p>存在於立法基礎上，透過制度去培訓人才、核發證照，讓台灣的護樹水準慢慢走入正軌。這只是一個開始，未來各縣市政府應強制要求，所有參與樹木工作的包商與人員都必須「持證上崗」。</p>
+          <cite>孫岩章</cite>
+        </div>
+
+      </div>
+
+      <!-- RIGHT COLUMN: sticky timeline -->
+      <div style="flex:1;position:relative;">
+        <div id="tl-sticky-right" style="position:sticky;top:0;height:calc(var(--vh,1vh)*100);display:flex;align-items:center;justify-content:center;padding:0 40px;">
+
+          <!-- big year watermark -->
+          <div id="tl-year" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:var(--serif);font-size:clamp(6rem,15vw,14rem);font-weight:900;color:rgba(201,168,76,0.06);letter-spacing:-.03em;pointer-events:none;white-space:nowrap;transition:all .5s ease;user-select:none">2015</div>
+
+          <!-- vertical timeline -->
+          <div style="position:relative;width:2px;height:60vh;background:rgba(245,240,232,0.07);">
+            <!-- active fill -->
+            <div id="tl-vline" style="position:absolute;top:0;left:0;width:100%;height:0%;background:rgba(201,168,76,0.5);transition:height .7s cubic-bezier(.16,1,.3,1)"></div>
+
+            <!-- 6 nodes -->
+            <div id="tlvn-0" class="tl-vnode" style="top:0%" data-pct="0">
+              <div class="tl-vdot"></div>
+              <div class="tl-vlabel tl-vlabel-r">
+                <div class="tl-vdate">2015/07</div>
+                <div class="tl-vtext">森林法修正<br>授權建立認證</div>
+              </div>
+            </div>
+            <div id="tlvn-1" class="tl-vnode" style="top:14%" data-pct="14">
+              <div class="tl-vdot"></div>
+              <div class="tl-vlabel tl-vlabel-l">
+                <div class="tl-vdate">2016/05</div>
+                <div class="tl-vtext">樹木普查方法<br>發布施行</div>
+              </div>
+            </div>
+            <div id="tlvn-2" class="tl-vnode" style="top:34%" data-pct="34">
+              <div class="tl-vdot" style="background:rgba(160,120,60,0.5);box-shadow:none;width:20px;height:20px;margin-left:-9px;border-radius:2px;transform:rotate(45deg)"></div>
+              <div class="tl-vlabel tl-vlabel-r">
+                <div class="tl-vdate" style="color:rgba(160,120,60,0.7)">2015–2025</div>
+                <div class="tl-vtext">認證制度空白期<br><span style="color:rgba(245,240,232,0.4);font-size:11px">依靠民間學會(如ISA)</span></div>
+              </div>
+            </div>
+            <div id="tlvn-3" class="tl-vnode" style="top:60%" data-pct="60">
+              <div class="tl-vdot" style="background:rgba(192,57,43,0.6);box-shadow:0 0 12px rgba(192,57,43,0.4)"></div>
+              <div class="tl-vlabel tl-vlabel-l">
+                <div class="tl-vdate" style="color:rgba(192,57,43,0.8)">2024/10</div>
+                <div class="tl-vtext">逢甲大學倒樹<br>致死事件</div>
+              </div>
+            </div>
+            <div id="tlvn-4" class="tl-vnode" style="top:78%" data-pct="78">
+              <div class="tl-vdot"></div>
+              <div class="tl-vlabel tl-vlabel-r">
+                <div class="tl-vdate">2025/04</div>
+                <div class="tl-vtext">農業部預告<br>認證辦法</div>
+              </div>
+            </div>
+            <div id="tlvn-5" class="tl-vnode" style="top:100%" data-pct="100">
+              <div class="tl-vdot" style="width:18px;height:18px;margin-left:-8px;margin-top:-8px;background:rgba(201,168,76,0.3);box-shadow:0 0 16px rgba(201,168,76,0.3)"></div>
+              <div class="tl-vlabel tl-vlabel-l">
+                <div class="tl-vdate">2026/04</div>
+                <div class="tl-vtext">認證法正式發布<br>初・中・高三級上路</div>
+              </div>
+            </div>
+          </div>
+
+          <div style="position:absolute;bottom:24px;left:0;right:0;text-align:center;font-size:10px;color:rgba(245,240,232,0.2);letter-spacing:.05em">資料來源：農業部、立法院</div>
+        </div>
+      </div>
+
+    </div>
+
+    <style>
+    .tl-vnode{position:absolute;left:50%;transform:translateX(-50%);display:flex;align-items:center;}
+    .tl-vdot{width:12px;height:12px;border-radius:50%;background:rgba(201,168,76,0.25);box-shadow:0 0 0 3px rgba(14,14,9,1),0 0 0 4px rgba(245,240,232,0.1);margin-left:-5px;margin-top:-5px;flex-shrink:0;transition:background .4s,box-shadow .4s}
+    .tl-vlabel{position:absolute;width:160px;top:-10px;}
+    .tl-vlabel-r{left:22px;}
+    .tl-vlabel-l{right:22px;text-align:right;}
+    .tl-vdate{font-size:10px;letter-spacing:.2em;color:rgba(201,168,76,0.4);margin-bottom:3px;font-family:var(--sans);transition:color .4s}
+    .tl-vtext{font-size:12px;color:rgba(245,240,232,0.3);line-height:1.6;font-family:var(--sans);transition:color .4s}
+    .tl-vnode.on .tl-vdot{background:rgba(201,168,76,0.85);box-shadow:0 0 0 3px rgba(14,14,9,1),0 0 0 5px rgba(201,168,76,0.4),0 0 14px rgba(201,168,76,0.3)}
+    .tl-vnode.on .tl-vdate{color:var(--gold)}
+    .tl-vnode.on .tl-vtext{color:rgba(245,240,232,0.85)}
+    .tl-vnode.done .tl-vdot{background:rgba(201,168,76,0.4)}
+    .tl-vnode.done .tl-vdate{color:rgba(201,168,76,0.5)}
+    .tl-vnode.done .tl-vtext{color:rgba(245,240,232,0.4)}
+    .tl-card.on{opacity:1!important}
+    @media(max-width:860px){
+      #tl-cards-col{flex:0 0 100%;max-width:100%;padding:60px 24px 80px;}
+      #tl-sticky-right{display:none!important}
+    }
+    </style>
+
+  </section>
+
+  <!-- 06 CLOSING -->
+  <section id="sec-p2-06" style="position:relative;background:#0a0806;">
+
+    <!-- 影片 A：結尾漂亮空景（屏1、2） -->
+    <div style="position:sticky;top:0;height:calc(var(--vh,1vh)*100);overflow:hidden;">
+      <div id="closing-video" style="position:absolute;top:0;left:0;width:100%;height:100%;overflow:hidden;filter:saturate(1.3) brightness(0.55);opacity:0;transition:opacity 2s ease;pointer-events:none;">
+        <iframe id="closing-video-iframe" src="https://www.youtube.com/embed/4-LIw_X83q0?autoplay=1&mute=1&loop=1&playlist=4-LIw_X83q0&controls=0&rel=0&modestbranding=1&playsinline=1&enablejsapi=1"
+          style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:177.78vh;height:100vh;min-width:100%;min-height:56.25vw;"
+          frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
+      </div>
+      <div style="position:absolute;inset:0;z-index:2;pointer-events:none;background:rgba(8,6,4,0.48);"></div>
+      <div style="position:absolute;top:0;left:0;right:0;height:20%;z-index:3;pointer-events:none;background:linear-gradient(to bottom,#0a0806,transparent);"></div>
+      <div style="position:absolute;bottom:0;left:0;right:0;height:20%;z-index:3;pointer-events:none;background:linear-gradient(to bottom,transparent,#0a0806);"></div>
+      <div style="position:absolute;bottom:20px;left:5vw;z-index:4;font-size:10px;color:rgba(245,240,232,0.25);letter-spacing:.03em;">攝影：吳冠廷</div>
+    </div>
+
+    <!-- 捲動驅動：屏1、2 -->
+    <div style="position:relative;margin-top:-100vh;z-index:4;">
+
+      <!-- 屏1：標題 + 預留字卡 + 引言 -->
+      <div style="height:calc(var(--vh,1vh)*100);display:flex;align-items:center;justify-content:center;padding:0 10vw;">
+        <div class="closing-sc" style="max-width:680px;width:100%;">
+          <div class="closing-card" style="background:rgba(8,6,4,0.72);border:1px solid var(--border-gold);backdrop-filter:blur(10px);">
+            <span class="sec-num" style="display:block;margin-bottom:1rem;">06 — 種樹與養樹</span>
+            <h2 class="sec-h" style="font-size:clamp(1.6rem,3.5vw,2.8rem);margin-bottom:1.6rem;">種樹之前，<em>先學會養樹</em></h2>
+            <p style="font-size:clamp(14px,1.6vw,16px);line-height:2.1;color:rgba(245,240,232,0.78);margin-bottom:1.4rem;">
+              <strong>一棵樹，能固碳、淨化空氣，甚至是讓一座城市涼下來</strong>，政府將「都市林」列為國家級氣候調適計畫，行政院新聞稿指出，5月25日召開「國家都市林推動委員會」，希望未來透過跨部會治理的體系能扭轉過去「各自為政而忽略生態保護」的工程建設思維。
+            </p>
+            <div style="border-left:3px solid var(--gold);padding:1rem 2rem;margin-bottom:1rem;background:var(--gold-glow);">
+              <p style="font-family:var(--serif);font-size:clamp(.95rem,1.8vw,1.1rem);font-weight:300;line-height:2;color:rgba(245,240,232,0.92);">環境部日前宣布，將在未來十年推動全台大規模種樹計畫，期望透過增加綠覆蓋率，緩解日益嚴重的都市熱島效應；環境部長彭啟明先前受媒體採訪時宣布，年底前結合氣象署的氣象預報資料，整合風力、風向及樹的資訊化系統，預測路樹倒塌的可能熱點，讓養護單位提前養護，減少風險。</p>
+            </div>
+            <div style="border-left:3px solid var(--gold);padding:1rem 2rem;background:var(--gold-glow);">
+              <p style="font-family:var(--serif);font-size:clamp(.95rem,1.8vw,1.1rem);font-weight:700;line-height:2;color:rgba(245,240,232,0.92);">當城市開始積極「種樹」，樹木被視為對抗氣候變遷的解方；但在種下更多樹之前，既有的樹，真的被好好對待了嗎？</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 屏2：兩段引述 -->
+      <div style="height:calc(var(--vh,1vh)*100);display:flex;align-items:center;justify-content:center;padding:0 10vw;">
+        <div class="closing-sc" style="max-width:680px;width:100%;">
+          <div class="closing-card" style="background:rgba(8,6,4,0.72);border:1px solid var(--border-gold);backdrop-filter:blur(10px);">
+            <div style="border-left:3px solid var(--gold);padding:1rem 2rem;margin-bottom:1.8rem;background:var(--gold-glow);">
+              <p style="font-family:var(--serif);font-size:clamp(.95rem,1.8vw,1.1rem);line-height:2;color:rgba(245,240,232,0.92);margin-bottom:.6rem;font-weight:700;">「樹其實跟人一樣，生病了也需要醫生。」</p>
+              <cite style="font-size:13px;line-height:1.8;color:rgba(245,240,232,0.72);font-style:normal;display:block;">孫岩章說，但在現實中，能夠獲得專業診治，往往只有被視為「珍貴」或具高度價值的樹木。</cite>
+            </div>
+            <div style="border-left:3px solid var(--gold);padding:1rem 2rem;background:var(--gold-glow);">
+              <p style="font-family:var(--serif);font-size:clamp(.95rem,1.8vw,1.1rem);line-height:2;color:rgba(245,240,232,0.92);margin-bottom:.6rem;font-weight:700;">「台灣生活在都市裡的樹，其實活得很悲哀。」</p>
+              <cite style="font-size:13px;line-height:1.8;color:rgba(245,240,232,0.72);font-style:normal;display:block;">陳鴻楷感嘆。當人們享受樹蔭與降溫，卻往往忽略，這些樹木長年被迫生活在狹小樹穴、不當修剪的環境之中，承受著不適合生長的處境。</cite>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="height:30vh;"></div>
+    </div>
+
+    <!-- sentinel：影片 B 淡入觸發點 -->
+    <div id="closing-b-sentinel" style="height:1px;"></div>
+
+    <!-- 影片 B：第三屏（新影片淡入） -->
+    <div style="position:sticky;top:0;height:calc(var(--vh,1vh)*100);overflow:hidden;">
+      <div id="closing-video-b" style="position:absolute;top:0;left:0;width:100%;height:100%;overflow:hidden;filter:saturate(1.2) brightness(0.55);opacity:0;transition:opacity 2s ease;pointer-events:none;">
+        <iframe id="closing-video-b-iframe" src="https://www.youtube.com/embed/5AI5eP8tR70?autoplay=1&mute=1&loop=1&playlist=5AI5eP8tR70&controls=0&rel=0&modestbranding=1&playsinline=1&enablejsapi=1"
+          style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:177.78vh;height:100vh;min-width:100%;min-height:56.25vw;"
+          frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
+      </div>
+      <div style="position:absolute;inset:0;z-index:2;pointer-events:none;background:rgba(8,6,4,0.5);"></div>
+      <div style="position:absolute;top:0;left:0;right:0;height:20%;z-index:3;pointer-events:none;background:linear-gradient(to bottom,#0a0806,transparent);"></div>
+      <div style="position:absolute;bottom:0;left:0;right:0;height:20%;z-index:3;pointer-events:none;background:linear-gradient(to bottom,transparent,#0a0806);"></div>
+      <div style="position:absolute;bottom:20px;right:.8rem;z-index:4;font-size:9px;color:rgba(245,240,232,0.2);letter-spacing:.04em;">示意影片　來源：Pexels</div>
+    </div>
+
+    <!-- 捲動驅動：屏3 -->
+    <div style="position:relative;margin-top:-100vh;z-index:4;">
+      <div style="height:calc(var(--vh,1vh)*100);display:flex;align-items:center;justify-content:center;padding:0 10vw;">
+        <div class="closing-sc" style="max-width:680px;width:100%;">
+          <div class="closing-card" style="background:rgba(8,6,4,0.72);border:1px solid var(--border-gold);backdrop-filter:blur(10px);">
+            <p style="font-size:clamp(14px,1.6vw,16px);line-height:2.1;color:rgba(245,240,232,0.78);margin-bottom:1.4rem;">
+              城市中樹木所帶來的綠色資產並非無償，從修剪、防治病蟲害，到保留足夠的生長空間，每一項都是成本；當一棵樹倒下，壓毀的不只是車輛，甚至奪走生命，人們往往歸因於天災(如強風、豪雨)，卻忽略這些風險，早已在長期的人為忽視中累積。
+            </p>
+            <div style="border-top:1px solid rgba(201,168,76,0.3);padding-top:1.6rem;">
+              <p style="font-family:var(--serif);font-size:clamp(1rem,1.9vw,1.2rem);line-height:2;color:var(--cream);font-weight:600;text-align:center;">
+                在「種樹」與「養樹」之間，讓真正懂樹的人進入制度，<br>
+                讓樹木在城市中真正健康生長，才能避免下一次悲劇重演，<br>
+                也才有可能走向人與樹共存的城市未來。
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="height:50vh;"></div>
+    </div>
+
+  </section>
+
+</div><!-- /p2 -->
+
+<footer>
+  <div style="margin-bottom:1.4rem;color:rgba(245,240,232,0.72);line-height:2.4;">
+    文字／吳冠廷<br>
+    攝影／張耀銘、吳冠廷<br>
+    圖表製作／張耀銘、吳冠廷、林子皓<br>
+    數據整理／張耀銘、邱浩賢<br>
+    協力／閻承禧、高樂怡<br>
+    特別感謝／盧怡安
+  </div>
+  <div style="color:rgba(245,240,232,0.45);">
+    資料來源／農業部林業試驗所林木疫情鑑定與資訊中心、東昕環境工程有限公司
+  </div>
+</footer>
+
+<!-- ═══ SIDE TOC ═══ -->
+<aside id="side-toc">
+  <div class="stoc-group on" id="stoc-p1">
+    <div class="stoc-part-label">第一篇</div>
+    <div class="stoc-item" data-t="sec-p1-01"><span class="stoc-num">01</span><span class="stoc-dot"></span><span class="stoc-lbl">天災還是人禍</span></div>
+    <div class="stoc-item" data-t="sat-section"><span class="stoc-num">02</span><span class="stoc-dot"></span><span class="stoc-lbl">衛星影像比對</span></div>
+    <div class="stoc-item" data-t="sec-p1-02"><span class="stoc-num">03</span><span class="stoc-dot"></span><span class="stoc-lbl">褐根病趨勢</span></div>
+    <div class="stoc-item" data-t="map-section"><span class="stoc-num">04</span><span class="stoc-dot"></span><span class="stoc-lbl">感染點位</span></div>
+    <div class="stoc-item" data-t="sec-p1-05"><span class="stoc-num">05</span><span class="stoc-dot"></span><span class="stoc-lbl">同一條街的兩棵樹</span></div>
+    <div class="stoc-item" data-t="sec-p1-06"><span class="stoc-num">06</span><span class="stoc-dot"></span><span class="stoc-lbl">無聲蔓延的褐根病</span></div>
+    <div class="stoc-item" data-t="sec-p1-07"><span class="stoc-num">07</span><span class="stoc-dot"></span><span class="stoc-lbl">感染後的選擇</span></div>
+  </div>
+  <div class="stoc-group" id="stoc-p2">
+    <div class="stoc-part-label">第二篇</div>
+    <div class="stoc-item" data-t="sec-p2-01"><span class="stoc-num">01</span><span class="stoc-dot"></span><span class="stoc-lbl">那一刀是誰做的</span></div>
+    <div class="stoc-item" data-t="sec-p2-02"><span class="stoc-num">02</span><span class="stoc-dot"></span><span class="stoc-lbl">現場直擊</span></div>
+    <div class="stoc-item" data-t="sec-p2-03"><span class="stoc-num">03</span><span class="stoc-dot"></span><span class="stoc-lbl">修剪 SOP</span></div>
+    <div class="stoc-item" data-t="sec-p2-04"><span class="stoc-num">04</span><span class="stoc-dot"></span><span class="stoc-lbl">樹木管理制度</span></div>
+    <div class="stoc-item" data-t="sec-p2-05"><span class="stoc-num">05</span><span class="stoc-dot"></span><span class="stoc-lbl">樹業有專攻</span></div>
+    <div class="stoc-item" data-t="sec-p2-06"><span class="stoc-num">06</span><span class="stoc-dot"></span><span class="stoc-lbl">種樹與養樹</span></div>
+  </div>
+</aside>
+
+<!-- ═══════════════════════════════════════════
+     SCRIPTS
+═══════════════════════════════════════════ -->
+<script>
+/* ── INIT ── */
+if(history.scrollRestoration)history.scrollRestoration='manual';
+window.scrollTo(0,0);
+/* ── iOS 100vh fix ── */
+(function(){function setVH(){document.documentElement.style.setProperty('--vh',window.innerHeight*0.01+'px')}setVH();window.addEventListener('resize',setVH);})();
+/* ── HERO TYPEWRITER INTRO ── */
+(function(){
+  const h1=document.querySelector('.hero-h1');
+  const tag=document.querySelector('.hero-tag');
+  const sub=document.querySelector('.hero-sub');
+  const choose=document.getElementById('hero-choose');
+  if(!h1)return;
+  const fullHTML=h1.innerHTML;
+  tag.style.opacity='0';
+  sub.style.opacity='0';
+  h1.style.opacity='0';
+  let audioCtx=null;
+  function playTick(){
+    if(!audioCtx)return;
+    try{
+      const t=audioCtx.currentTime;
+      const dur=0.02;
+      const len=Math.floor(audioCtx.sampleRate*dur);
+      const buf=audioCtx.createBuffer(1,len,audioCtx.sampleRate);
+      const d=buf.getChannelData(0);
+      for(let k=0;k<len;k++){
+        const env=Math.pow(1-k/len,3);
+        d[k]=(Math.random()*2-1)*env;
+      }
+      const src=audioCtx.createBufferSource();src.buffer=buf;
+      const hpf=audioCtx.createBiquadFilter();hpf.type='highpass';hpf.frequency.value=1200;
+      const gain=audioCtx.createGain();gain.gain.setValueAtTime(1.2,t);
+      src.connect(hpf);hpf.connect(gain);gain.connect(audioCtx.destination);
+      src.start(t);src.stop(t+dur+0.005);
+    }catch(e){}
+  }
+  function typewrite(el,html,speed,done){
+    el.style.opacity='1';el.innerHTML='';
+    let i=0,cur='';
+    (function step(){
+      if(i>=html.length){el.innerHTML=html;if(done)done();return;}
+      if(html[i]==='<'){const end=html.indexOf('>',i);if(end!==-1){cur+=html.slice(i,end+1);i=end+1;step();return;}}
+      cur+=html[i++];
+      el.innerHTML=cur+'<span class="tw-cursor"></span>';
+      if(!/[\s，。？！]/.test(html[i-1]))playTick();
+      setTimeout(step,speed);
+    })();
+  }
+  function startSequence(){
+    // 在使用者手勢內建立 AudioContext，確保瀏覽器解鎖音訊
+    try{audioCtx=new(window.AudioContext||window.webkitAudioContext)();}catch(e){}
+    const startEl=document.getElementById('hero-start');
+    if(startEl){startEl.style.transition='opacity .4s ease';startEl.style.opacity='0';setTimeout(()=>startEl.style.display='none',400);}
+    setTimeout(function(){
+      typewrite(h1,fullHTML,80,function(){
+        setTimeout(function(){
+          tag.style.transition='opacity .8s ease';tag.style.opacity='1';
+          setTimeout(function(){
+            sub.style.transition='opacity .9s ease';sub.style.opacity='1';
+            setTimeout(function(){if(choose)choose.classList.add('revealed');},500);
+          },350);
+        },2000);
+      });
+    },300);
+  }
+  const startEl=document.getElementById('hero-start');
+  if(startEl)startEl.addEventListener('click',function(){
+    startSequence();
+    if(window.ytPlayAll)window.ytPlayAll();
+  },{once:true});
+})();
+
+
+/* ── PROGRESS BAR ── */
+window.addEventListener('scroll',()=>{
+  const p=window.scrollY/(document.body.scrollHeight-window.innerHeight)*100;
+  document.getElementById('pbar').style.width=p+'%';
+},{passive:true});
+
+/* ── PART SWITCHING ── */
+let _fp=false;
+function refreshFade(){_fp=true;requestAnimationFrame(()=>requestAnimationFrame(()=>{_fp=false;checkReveal()}))}
+
+function getAbsTop(el){let t=0;while(el){t+=el.offsetTop;el=el.offsetParent}return t}
+
+function switchPart(id,btn){
+  document.querySelectorAll('.part').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.part-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if(btn)btn.classList.add('active');
+  const navH=(document.getElementById('top-nav')||{}).offsetHeight||0;
+  const firstSec=document.querySelector('#'+id+' section');
+  const top=firstSec?Math.max(0,getAbsTop(firstSec)-navH):0;
+  refreshFade();
+  window.scrollTo(0,top);
+  syncToc(id);
+}
+
+function heroGo(id){
+  document.getElementById('top-nav').style.display='';
+  document.querySelectorAll('.part').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.part-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.getElementById('btn-'+id).classList.add('active');
+  refreshFade();
+  window.scrollTo(0,0);
+  syncToc(id);
+}
+
+function readPart2(){switchPart('p2',document.getElementById('btn-p2'))}
+
+function syncToc(id){
+  const toc=document.getElementById('side-toc');
+  if(toc)toc.classList.add('vis');
+  document.querySelectorAll('.stoc-group').forEach(g=>g.classList.remove('on'));
+  const g=document.getElementById('stoc-'+id);
+  if(g)g.classList.add('on');
+}
+
+/* ── REVEAL ON SCROLL ── */
+function checkReveal(){
+  if(_fp)return;
+  const vpH=window.innerHeight;
+  document.querySelectorAll('.reveal:not(.vis),.reveal-l:not(.vis),.stat-item:not(.vis)').forEach(el=>{
+    if(!el.offsetParent)return;
+    const r=el.getBoundingClientRect();
+    if(r.top<vpH*.92&&r.bottom>0)el.classList.add('vis');
+  });
+}
+window.addEventListener('scroll',checkReveal,{passive:true});
+window.addEventListener('load',checkReveal);
+
+/* ── TOC SCROLL SPY ── */
+const P_SECS={
+  p1:['sec-p1-01','sat-section','sec-p1-02','map-section','sec-p1-05','sec-p1-06','sec-p1-07'],
+  p2:['sec-p2-01','sec-p2-02','sec-p2-03','sec-p2-04','sec-p2-05','sec-p2-06']
+};
+document.querySelectorAll('.stoc-item').forEach(item=>{
+  item.addEventListener('click',()=>{
+    const t=item.getAttribute('data-t');
+    const el=document.getElementById(t);if(!el)return;
+    const navH=(document.getElementById('top-nav')||{}).offsetHeight||0;
+    window.scrollTo({top:Math.max(0,getAbsTop(el)-navH-8),behavior:'smooth'});
+  });
+});
+function updateToc(){
+  const navH=(document.getElementById('top-nav')||{}).offsetHeight||0;
+  const trigger=navH+40;
+  const ap=['p1','p2'].find(p=>{const e=document.getElementById(p);return e&&e.classList.contains('active')});
+  if(!ap)return;
+  const ids=P_SECS[ap];
+  let aid=null;
+  for(let i=ids.length-1;i>=0;i--){
+    const el=document.getElementById(ids[i]);
+    if(el&&el.getBoundingClientRect().top<=trigger){aid=ids[i];break;}
+  }
+  const aidx=aid?ids.indexOf(aid):-1;
+  document.querySelectorAll('.stoc-item').forEach(item=>{
+    const t=item.getAttribute('data-t');
+    const idx=ids.indexOf(t);
+    item.classList.toggle('on',t===aid);
+    item.classList.toggle('done',idx>=0&&aidx>0&&idx<aidx);
+  });
+}
+let tocTick=false;
+window.addEventListener('scroll',()=>{if(!tocTick){requestAnimationFrame(()=>{updateToc();tocTick=false});tocTick=true}},{passive:true});
+
+/* ── SATELLITE STICKY ── */
+(function(){
+  const cards=document.querySelectorAll('[data-sat]');
+  const obs=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        e.target.classList.add('vis');
+        const s=parseInt(e.target.dataset.sat);
+        [0,1,2,3,4].forEach(i=>{
+          document.getElementById('sl-'+i).style.opacity=i===s?'1':'0';
+          document.getElementById('sdot-'+i).classList.toggle('on',i===s);
+        });
+      }
+    });
+  },{threshold:.5});
+  cards.forEach(c=>obs.observe(c));
+})();
+
+/* ── BROWN ROOT PHOTO scroll ── */
+(function(){
+  let cur=-1;
+  function showPhoto(n){
+    if(n===cur)return;
+    cur=n;
+    for(let i=0;i<4;i++){const img=document.getElementById('br-img-'+i);if(img)img.style.opacity=i===n?'1':'0';}
+    const counter=document.getElementById('br-counter');
+    if(counter)counter.textContent=(n+1)+' / 4';
+  }
+  const obs=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        const n=parseInt(e.target.dataset.br);
+        if(!isNaN(n)){showPhoto(n);e.target.classList.add('vis');}
+      }
+    });
+  },{threshold:0.5,rootMargin:'-5% 0px -25% 0px'});
+  document.querySelectorAll('.br-sc[data-br]').forEach(c=>obs.observe(c));
+})();
+
+/* ── TWO TREES CARD SWITCH ── */
+(function(){
+  const cards=Array.from({length:2},(_,i)=>document.getElementById('tree-card-'+i));
+  function show(n){cards.forEach((c,i)=>{if(c)c.classList.toggle('vis',i===n)});}
+  show(0);
+  const obs=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{if(e.isIntersecting)show(parseInt(e.target.dataset.card));});
+  },{threshold:0,rootMargin:'-40% 0px -40% 0px'});
+  document.querySelectorAll('.tree-trigger').forEach(t=>obs.observe(t));
+})();
+
+/* ── CLOSING VIDEO FADE-IN ── */
+(function(){
+  // 影片 A
+  const vidA=document.getElementById('closing-video');
+  const sec=document.getElementById('sec-p2-06');
+  if(vidA&&sec){
+    const obsA=new IntersectionObserver(entries=>{
+      entries.forEach(e=>{if(e.isIntersecting){vidA.style.opacity='1';obsA.disconnect();}});
+    },{threshold:0.08});
+    obsA.observe(sec);
+  }
+  // 影片 B（sentinel 觸發淡入）
+  const vidB=document.getElementById('closing-video-b');
+  const sentB=document.getElementById('closing-b-sentinel');
+  if(vidB&&sentB){
+    const obsB=new IntersectionObserver(entries=>{
+      entries.forEach(e=>{
+        if(e.isIntersecting){vidB.style.opacity='1';obsB.disconnect();}
+      });
+    },{threshold:0,rootMargin:'0px 0px -30% 0px'});
+    obsB.observe(sentB);
+  }
+  // 結尾文字卡淡入
+  const obsC=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('vis');});
+  },{threshold:0.25});
+  document.querySelectorAll('.closing-sc').forEach(c=>obsC.observe(c));
+})();
+
+/* ── MAP YEAR OVERLAY（IntersectionObserver 同步版） ── */
+(function(){
+  const START=2016,TOTAL=11;
+  const SECS=21.25; // ← 調這個數字對齊 Flourish（越大越慢）
+  const MS=(SECS/TOTAL)*1000;
+  const el=document.getElementById('map-year-display');
+  const sentinel=document.getElementById('map-sentinel');
+  if(!el||!sentinel)return;
+
+  let timer=null,idx=0;
+
+  function getIframe(){
+    return document.querySelector('#map-section .flourish-embed iframe');
+  }
+
+  function resetFlourish(){
+    const f=getIframe();
+    if(!f)return;
+    // 嘗試叫 Flourish 跳回第一個時間步驟
+    try{
+      f.contentWindow.postMessage({method:'set_time',params:{time:0}},'*');
+      f.contentWindow.postMessage({time:2016},'*');
+      f.contentWindow.postMessage({method:'go_to_slide',params:{index:0}},'*');
+    }catch(e){}
+  }
+
+  function startCounter(){
+    if(timer)clearInterval(timer);
+    idx=0;
+    el.textContent=START;
+    resetFlourish();
+    timer=setInterval(function(){
+      idx=(idx+1)%TOTAL;
+      el.textContent=START+idx;
+    },MS);
+  }
+
+  function stopCounter(){
+    if(timer){clearInterval(timer);timer=null;}
+  }
+
+  // 用戶捲到地圖區塊 → 重置並同步啟動
+  const obs=new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){
+        startCounter();
+      } else {
+        stopCounter();
+      }
+    });
+  },{threshold:0});
+
+  obs.observe(sentinel);
+
+  // 備援：若 Flourish 有發 time 事件則直接用
+  window.addEventListener('message',function(e){
+    if(!e.origin.includes('flourish'))return;
+    const d=e.data;
+    if(d&&d.time!=null){
+      if(timer){clearInterval(timer);timer=null;}
+      el.textContent=Math.round(d.time);
+    }
+  });
+})();
+
+/* ── MAP CARDS ── */
+(function(){
+  const obs=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('vis');});
+  },{threshold:0.5,rootMargin:'-5% 0px -25% 0px'});
+  document.querySelectorAll('.map-sc[data-map]').forEach(c=>obs.observe(c));
+  // disease step cards
+  const obsD=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('vis')});
+  },{threshold:.4});
+  document.querySelectorAll('[data-step-disease]').forEach(el=>obsD.observe(el));
+})();
+
+/* ── CHART ── */
+(function(){
+  const labels=['05','06','07','08','09','10','11','12','01','02','03','04'];
+  const full=['2025/05','2025/06','2025/07','2025/08','2025/09','2025/10','2025/11','2025/12','2026/01','2026/02','2026/03','2026/04'];
+  const tF=[1431,11595,18107,5380,3045,3689,1933,1453,807,681,2207,1832];
+  const rT=[2832,8798,22200,9717,5405,5105,6189,4313,5680,2910,2421,2734];
+  const bR=[92,1220,431,443,119,137,112,14,125,44,323,73];
+  const pr=[405,478,637,479,342,297,662,279,402,185,852,426];
+  const hot=[1,2,5];
+  const gc='rgba(245,240,232,0.06)',tc='rgba(245,240,232,0.38)';
+  const mk=(h,d)=>(_,i)=>hot.includes(i)?h:d;
+  const obs=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        new Chart(document.getElementById('chart4s'),{
+          type:'bar',
+          data:{labels,datasets:[
+            {label:'樹倒',data:tF,backgroundColor:tF.map(mk('#C0392B','rgba(192,57,43,0.25)')),borderRadius:2,borderSkipped:false,barPercentage:.82,categoryPercentage:.88},
+            {label:'路樹',data:rT,backgroundColor:rT.map(mk('#4A7EAA','rgba(74,126,170,0.25)')),borderRadius:2,borderSkipped:false,barPercentage:.82,categoryPercentage:.88},
+            {label:'褐根病',data:bR,backgroundColor:bR.map(mk('#7A7A70','rgba(122,122,112,0.3)')),borderRadius:2,borderSkipped:false,barPercentage:.82,categoryPercentage:.88},
+            {label:'樹木修剪',data:pr,backgroundColor:pr.map(mk('#5A8A2E','rgba(90,138,46,0.3)')),borderRadius:2,borderSkipped:false,barPercentage:.82,categoryPercentage:.88},
+          ]},
+          options:{
+            responsive:true,maintainAspectRatio:false,
+            interaction:{mode:'index',intersect:false},
+            plugins:{
+              legend:{display:false},
+              tooltip:{backgroundColor:'#1A1A14',borderColor:'rgba(201,168,76,.25)',borderWidth:1,titleColor:'rgba(245,240,232,.9)',bodyColor:'rgba(245,240,232,.6)',padding:10,
+                callbacks:{title:i=>full[i[0].dataIndex],label:c=>c.dataset.label+'：'+c.parsed.y.toLocaleString()+' 則'}}
+            },
+            scales:{
+              x:{grid:{display:false},ticks:{color:tc,font:{size:10},maxRotation:0}},
+              y:{grid:{color:gc},border:{dash:[3,3]},ticks:{color:tc,font:{size:10},callback:v=>v>=1000?(v/1000).toFixed(0)+'k':v},title:{display:true,text:'聲量（則數）',color:tc,font:{size:10}}}
+            }
+          }
+        });
+        obs.disconnect();
+      }
+    });
+  },{threshold:.2});
+  obs.observe(document.getElementById('chart4s'));
+})();
+
+/* ── COUNTY CHART ── */
+(function(){
+  const total=22;
+  const data=[
+    {label:"人具專業資格",yes:["基隆市","桃園市","臺北市","新竹市","新竹縣","臺中市","臺南市","連江縣"],no:["新北市","苗栗縣","彰化縣","雲林縣","嘉義市","嘉義縣","高雄市","澎湖縣","金門縣","南投縣","宜蘭縣","臺東縣","花蓮縣","屏東縣"]},
+    {label:"例行巡檢 SOP",yes:["基隆市","桃園市","臺北市","新北市","新竹市","臺中市","雲林縣","臺南市","高雄市","連江縣","南投縣"],no:["新竹縣","苗栗縣","彰化縣","嘉義市","嘉義縣","澎湖縣","金門縣","宜蘭縣","臺東縣","花蓮縣","屏東縣"]},
+    {label:"褐根病防治",yes:["桃園市","臺北市","新竹市","臺中市","嘉義市","臺南市","連江縣"],no:["基隆市","新北市","新竹縣","苗栗縣","彰化縣","雲林縣","嘉義縣","高雄市","澎湖縣","金門縣","南投縣","宜蘭縣","臺東縣","花蓮縣","屏東縣"]},
+  ];
+  const maxH=220;
+  let activeKey=null;
+  const detail=document.getElementById('crt-detail');
+  const chart=document.getElementById('crt-chart');
+  chart.innerHTML=data.map((d,di)=>{
+    const yH=Math.round(d.yes.length/total*maxH),nH=maxH-yH;
+    return`<div class="crt-col"><div class="crt-bar-wrap"><div class="crt-seg crt-no" style="height:${nH}px" data-di="${di}" data-type="no">${d.no.length}</div><div class="crt-seg crt-yes" style="height:${yH}px" data-di="${di}" data-type="yes">${d.yes.length}</div></div><div class="crt-col-label">${d.label}</div></div>`;
+  }).join('');
+  chart.querySelectorAll('.crt-seg').forEach(el=>{
+    el.addEventListener('click',function(){
+      const di=parseInt(this.dataset.di),type=this.dataset.type,key=di+'-'+type;
+      chart.querySelectorAll('.crt-seg').forEach(s=>s.classList.remove('active'));
+      if(activeKey===key){activeKey=null;detail.innerHTML='<p class="crt-hint">點擊上方長條，查看各縣市狀況</p>';return;}
+      activeKey=key;this.classList.add('active');
+      const d=data[di],cities=type==='yes'?d.yes:d.no,cls=type==='yes'?'crt-tag-yes':'crt-tag-no',word=type==='yes'?'已建立':'尚未建立';
+      detail.innerHTML=`<div class="crt-detail-title">${d.label}　${word}（${cities.length} 縣市）</div><div class="crt-tags">${cities.map(c=>`<span class="crt-tag ${cls}">${c}</span>`).join('')}</div>`;
+    });
+  });
+})();
+
+/* ── CHAIN (transmission) ── */
+const MODES=[
+  {bar:'根部接觸傳播',totalSteps:4,dotCount:4,steps:[
+    {step:'步驟 0 ／ 4',text:'<strong>路樹 1 是病源。</strong>根系已在地下帶菌，向四面延伸，點擊「下一步」看病菌如何往下一棵樹傳遞。'},
+    {step:'步驟 1 ／ 4',text:'<strong>路樹 2 感染。</strong>病樹 1 的根系向右延伸，與路樹 2 的根系在地下直接接觸，病菌沿根際傳入。',bridge:'b12',infect:2},
+    {step:'步驟 2 ／ 4',text:'<strong>路樹 3 感染。</strong>路樹 2 成了新病源，繼續透過根部接觸感染路樹 3。地下的傳播鏈悄悄延伸。',bridge:'b23',infect:3},
+    {step:'步驟 3 ／ 4',text:'<strong>路樹 4 感染。</strong>此時地面上的樹木外觀不容易發現，褐根病初期幾乎沒有可見症狀。',bridge:'b34',infect:4},
+    {step:'步驟 4 ／ 4',text:'<strong>路樹 5 感染，整排淪陷。</strong>從一棵病樹開始，五棵路樹的根系全數帶菌，全部中標。',bridge:'b45',infect:5}
+  ]},
+  {bar:'孢子空氣飄散',totalSteps:3,dotCount:3,steps:[
+    {step:'步驟 0 ／ 3',text:'<strong>路樹 1 進入感染晚期。</strong>基部長出子實體，準備大量釋放擔孢子——點擊「下一步」。'},
+    {step:'步驟 1 ／ 3',text:'<strong>孢子隨風飄散。</strong>擔孢子極為輕微，可隨氣流漂移數十公尺，在傷口或裸露根系上找到入侵機會。',spore:true},
+    {step:'步驟 2 ／ 3',text:'<strong>路樹 2、3 受感染。</strong>孢子在傷口上萌發，開始新一輪感染。颱風後樹木傷口增多，正是感染高峰。',infectTrees:[2,3]},
+    {step:'步驟 3 ／ 3',text:'<strong>孢子傳播難以阻斷。</strong>一棵病樹每年可釋放數百萬個孢子。早期發現、盡速移除病樹是唯一有效手段。'}
+  ]},
+  {bar:'帶菌苗木移植',totalSteps:3,dotCount:3,steps:[
+    {step:'步驟 0 ／ 3',text:'<strong>帶菌苗木準備移植。</strong>外觀健康的苗木根球中藏有病菌，未經檢疫便被運往新的種植地點。'},
+    {step:'步驟 1 ／ 3',text:'<strong>卡車運送，病菌跨越地理屏障。</strong>苗木連同根球土壤被運送，病菌藉此跨越地理屏障抵達新路段。',truck:true},
+    {step:'步驟 2 ／ 3',text:'<strong>路樹 5 種下即帶菌。</strong>新植苗木落地後，帶菌根系開始在土壤中蔓延，周遭健康樹木面臨威脅。',infectTrees:[5]},
+    {step:'步驟 3 ／ 3',text:'<strong>苗木出圃前的嚴格檢疫、拒絕使用來源不明苗木。</strong>'}
+  ]},
+  {bar:'土壤殘菌感染',totalSteps:3,dotCount:3,steps:[
+    {step:'步驟 0 ／ 3',text:'<strong>舊病樹已被移除，但土壤仍帶菌。</strong>褐根病菌的菌體可在土壤中存活超過 10 年——點擊「下一步」。'},
+    {step:'步驟 1 ／ 3',text:'<strong>新樹補植於原址附近。</strong>新植苗木的根系向外延伸，在土壤中遇到殘留菌體，感染即將發生。',soilShow:true},
+    {step:'步驟 2 ／ 3',text:'<strong>路樹 5 重新感染。</strong>根系碰觸帶菌土壤，病菌趁機入侵。這正是許多路段「補植後仍持續死亡」的原因。',infectTrees:[5],soilInfect:true},
+    {step:'步驟 3 ／ 3',text:'<strong>惡性循環難以終止。</strong>若未進行土壤燻蒸消毒，同一地點可能反覆感染。補植前的土壤檢測是必要步驟。'}
+  ]}
+];
+const TC2={
+  infected:{ca:'#4a3420',cb:'#3c2a18',cc:'#3e2c1a',tr:'#6b4c2a',root:'#8B4513',lb:'#E07070'},
+  healthy: {ca:'#3a7030',cb:'#2a5018',cc:'#306020',tr:'#8a7050',root:'rgba(139,100,60,0.5)',lb:'rgba(245,240,232,0.45)'},
+  dim:     {ca:'rgba(80,76,68,0.45)',cb:'rgba(60,56,48,0.45)',cc:'rgba(70,66,58,0.45)',tr:'rgba(100,96,88,0.35)',root:'rgba(100,96,88,0.3)',lb:'rgba(245,240,232,0.2)'}
+};
+let curMode=0,curStep=0,sporeTick=0,sporeRAF=null,truckX=0,truckRAF=null,soilRAF=null,soilPh=0;
+function sa(id,a,v){const e=document.getElementById(id);if(e)e.setAttribute(a,v)}
+function so(id,v){sa(id,'opacity',v)}
+function setTree(n,state){
+  const c=TC2[state];
+  sa(`ca${n}`,'fill',c.ca);sa(`cb${n}`,'fill',c.cb);sa(`cc${n}`,'fill',c.cc);sa(`tr${n}`,'fill',c.tr);
+  ['L','C','R'].forEach(x=>sa(`r${n}${x}`,'stroke',c.root));
+  const lb=document.getElementById(`lb${n}`);
+  if(lb){lb.setAttribute('fill',c.lb);lb.textContent=state==='infected'?`路樹 ${n===1?'（染病）':n+'（染病）'}`:`路樹 ${n}`}
+  so(`dot${n}`,state==='infected'?1:0);
+}
+function animBridge(id,cb){
+  const el=document.getElementById(id);if(!el){if(cb)cb();return}
+  el.setAttribute('stroke-dashoffset','80');let t=0;
+  (function tick(){t+=3;const o=Math.max(0,80-t);el.setAttribute('stroke-dashoffset',o);if(o>0)requestAnimationFrame(tick);else if(cb)cb()})();
+}
+function stopAnims(){
+  if(sporeRAF){cancelAnimationFrame(sporeRAF);sporeRAF=null}
+  if(truckRAF){cancelAnimationFrame(truckRAF);truckRAF=null}
+  if(soilRAF){cancelAnimationFrame(soilRAF);soilRAF=null}
+  sporeTick=0;truckX=0;soilPh=0;
+}
+function runSpores(){
+  so('spore-grp',1);so('w1',.5);so('w2',.35);so('lnd2',.7);so('lnd3',.55);
+  sporeTick++;
+  document.querySelectorAll('.sp').forEach((s,i)=>{
+    const ph=(sporeTick*.65+i*33)%130,prog=ph/130,dx=prog*(80+i*12),dy=-prog*(14+i*4);
+    const op=prog<.1?prog*10:prog>.8?(1-prog)*5:.8;
+    s.setAttribute('transform',`translate(${dx},${dy})`);s.setAttribute('opacity',op);
+  });
+  if(curMode===1)sporeRAF=requestAnimationFrame(runSpores);
+}
+function runTruck(){
+  so('truck-grp',1);truckX=(truckX+.6)%660;
+  const t=document.getElementById('truck');if(t)t.setAttribute('transform',`translate(${16+truckX},144)`);
+  const tr=document.getElementById('truck-trail');
+  if(tr){const end=Math.min(16+truckX+52,690);tr.setAttribute('d',`M68 176 L${end} 176`);tr.setAttribute('opacity',.35)}
+  so('dest-pin',truckX>520?.9:0);
+  if(curMode===2)truckRAF=requestAnimationFrame(runTruck);
+}
+function runSoil(){
+  soilPh+=.04;
+  const arr=document.getElementById('soil-arrow');
+  if(arr){arr.setAttribute('opacity',.4+.45*Math.sin(soilPh));arr.setAttribute('stroke-dashoffset',-soilPh*16)}
+  if(curMode===3)soilRAF=requestAnimationFrame(runSoil);
+}
+function buildDots(cnt){
+  const c=document.getElementById('chain-dots');c.innerHTML='';
+  for(let i=0;i<cnt;i++){const d=document.createElement('div');d.className='chain-dot';d.id=`d${i}`;c.appendChild(d)}
+}
+function updateDots(){
+  const m=MODES[curMode];
+  for(let i=0;i<m.dotCount;i++){const d=document.getElementById(`d${i}`);if(!d)continue;d.className='chain-dot'+(i<curStep?' done':i===curStep-1?' active':'')}
+}
+function updateCaption(s){
+  document.getElementById('cap-step').textContent=s.step;
+  document.getElementById('cap-text').innerHTML=s.text;
+  const cap=document.querySelector('.chain-caption');
+  cap.classList.remove('fade-up');void cap.offsetWidth;cap.classList.add('fade-up');
+}
+function fullReset(){
+  stopAnims();
+  setTree(1,'infected');for(let n=2;n<=5;n++)setTree(n,'healthy');
+  ['b12','b23','b34','b45'].forEach(id=>{const e=document.getElementById(id);if(e)e.setAttribute('stroke-dashoffset','80')});
+  so('spore-grp',0);so('truck-grp',0);so('soil-blob',0);so('soil-arrow',0);
+  so('w1',0);so('w2',0);so('lnd2',0);so('lnd3',0);so('truck-trail',0);so('dest-pin',0);
+  document.querySelectorAll('.sp').forEach(s=>{s.setAttribute('opacity',0);s.setAttribute('transform','')});
+  const t=document.getElementById('truck');if(t)t.setAttribute('transform','translate(16,144)');
+}
+function setMode(idx){
+  curMode=idx;curStep=0;
+  document.querySelectorAll('.chain-tab').forEach((t,i)=>t.classList.toggle('active',i===idx));
+  fullReset();
+  document.getElementById('mode-bar').textContent=MODES[idx].bar;
+  buildDots(MODES[idx].dotCount);updateDots();updateCaption(MODES[idx].steps[0]);
+  so('hint',1);document.getElementById('btn-next').disabled=false;
+  if(idx===2){setTree(1,'dim');for(let n=2;n<=4;n++)setTree(n,'dim');setTree(5,'healthy')}
+  if(idx===3){setTree(1,'dim');for(let n=2;n<=4;n++)setTree(n,'dim');setTree(5,'healthy')}
+}
+function nextStep(){
+  const m=MODES[curMode];if(curStep>=m.totalSteps)return;
+  curStep++;if(curStep===1)so('hint',0);
+  const s=m.steps[curStep];
+  updateCaption(s);updateDots();
+  if(s.bridge)animBridge(s.bridge,()=>{if(s.infect)setTree(s.infect,'infected')});
+  if(s.spore&&curMode===1)runSpores();
+  if(s.infectTrees)s.infectTrees.forEach(n=>setTree(n,'infected'));
+  if(s.truck&&curMode===2)runTruck();
+  if(s.soilShow)so('soil-blob',1);
+  if(s.soilInfect){so('soil-arrow',1);runSoil()}
+  if(curStep>=m.totalSteps)document.getElementById('btn-next').disabled=true;
+}
+function resetMode(){setMode(curMode)}
+setMode(0);
+
+/* ── PRUNING ── */
+var cuts=0,MAX=5,CROWN_TOP=5,cutH=[0,24,52,88,126,165],healTimers=[],callusIds=[];
+var stages=[
+  {p:100,pc:'#4A8A3E',coF:'#4A8A3E',ciF:'#5A9E4E',coO:.88,b:'持平',bc:'#5A9E4E',dead:0,rO:.6,heal:0,hs:'—',hc:'rgba(245,240,232,0.38)',msg:'健康狀態。葉片茂密，光合作用旺盛，能量收支平衡，根系強健。'},
+  {p:82,pc:'#5A8A3E',coF:'#4A8A3E',ciF:'#5A9E4E',coO:.84,b:'微降',bc:'#8B9A3E',dead:0,rO:.58,heal:65,hs:'癒合中',hc:'#4A8A3E',msg:'<strong>第一刀。</strong>樹木啟動防禦機制，嘗試癒合傷口。傷口還在可復原範圍內。'},
+  {p:58,pc:'#8B8030',coF:'#6A8A3A',ciF:'#7A9A48',coO:.76,b:'赤字',bc:'#C0392B',dead:0,rO:.44,heal:30,hs:'癒合受阻',hc:'#8B7A30',msg:'<strong>第二刀。</strong>新傷口蓋上舊傷口，癒合進度被打斷。傷口越大，越難癒合。'},
+  {p:36,pc:'#A07830',coF:'#8A8438',ciF:'#9A9445',coO:.60,b:'嚴重赤字',bc:'#A32D2D',dead:0,rO:.28,heal:0,hs:'癒合失敗',hc:'#C0392B',msg:'<strong>第三刀。</strong>傷口無法癒合，成為病菌入口。光合作用剩36%，根系因能量不足開始退化。'},
+  {p:18,pc:'#B05020',coF:'#907825',ciF:'#807018',coO:.44,b:'危急',bc:'#A32D2D',dead:1,rO:.14,heal:0,hs:'已潰爛',hc:'#A32D2D',msg:'<strong>第四刀。</strong>飢餓現象全面啟動——收入減少、支出不斷，樹木陷入能量赤字。枝條開始枯死。'},
+  {p:5,pc:'#C03020',coF:'#7A6020',ciF:'#6A5018',coO:.26,b:'衰竭',bc:'#791F1F',dead:1,rO:.04,heal:0,hs:'已潰爛',hc:'#A32D2D',msg:'<strong>第五刀。</strong>樹勢漸漸衰弱——如同人一般，身體虛弱就容易生病。'},
+];
+var wPos=[{cx:110,r:8},{cx:58,r:6},{cx:164,r:7},{cx:86,r:5},{cx:142,r:5.5}];
+function pgCut(){
+  if(cuts>=MAX)return;cuts++;
+  var s=stages[cuts];
+  var btn=document.getElementById('pg-knife');
+  healTimers.forEach(clearInterval);healTimers=[];
+  var clipY=CROWN_TOP+cutH[cuts];
+  document.getElementById('pg-clip-rect').setAttribute('y',clipY);
+  document.getElementById('pg-clip-rect').setAttribute('height',290-clipY);
+  var face=document.getElementById('pg-cutface');
+  face.setAttribute('y',clipY-3);face.setAttribute('height',5);face.setAttribute('opacity',.7);
+  document.getElementById('pg-co').setAttribute('fill',s.coF);document.getElementById('pg-co').setAttribute('opacity',s.coO);
+  document.getElementById('pg-ci').setAttribute('fill',s.ciF);
+  callusIds.forEach(id=>{var el=document.getElementById(id);if(el){el.setAttribute('fill','#5A3A1A');el.setAttribute('opacity','.45')}});
+  var wp=wPos[cuts-1];var wg=document.getElementById('pg-wounds');
+  var wc=document.createElementNS('http://www.w3.org/2000/svg','circle');
+  wc.setAttribute('cx',wp.cx);wc.setAttribute('cy',clipY+3);wc.setAttribute('r',wp.r);
+  wc.setAttribute('fill','#6B3A12');wc.setAttribute('stroke','#C0392B');wc.setAttribute('stroke-width','1.2');
+  wg.appendChild(wc);
+  if(cuts<=2&&s.heal>0){
+    var cg=document.getElementById('pg-callus'),cid='callus-'+cuts;
+    var cc=document.createElementNS('http://www.w3.org/2000/svg','rect');
+    cc.setAttribute('id',cid);cc.setAttribute('x',wp.cx-wp.r);cc.setAttribute('y',clipY);
+    cc.setAttribute('width',wp.r*2);cc.setAttribute('height',3);cc.setAttribute('rx','1.5');
+    cc.setAttribute('fill','#2A6A2A');cc.setAttribute('opacity','0');
+    cg.appendChild(cc);callusIds.push(cid);
+    var hp=0,target=s.heal,bar=document.getElementById('pg-heal-bar');
+    var t=setInterval(()=>{hp=Math.min(hp+1.2,target);bar.style.width=hp+'%';if(hp>=target){clearInterval(t);cc.setAttribute('opacity','.85')}},20);
+    healTimers.push(t);
+  }
+  if(cuts>=3){document.getElementById('pg-heal-bar').style.width='0%';document.getElementById('pg-heal-bar').style.backgroundColor='#C0392B'}
+  document.getElementById('pg-pval').textContent=s.p+'%';document.getElementById('pg-pval').style.color=s.pc;
+  document.getElementById('pg-pbar').style.width=s.p+'%';document.getElementById('pg-pbar').style.backgroundColor=s.pc;
+  document.getElementById('pg-bval').textContent=s.b;document.getElementById('pg-bval').style.color=s.bc;
+  document.getElementById('pg-heal-status').textContent=s.hs;document.getElementById('pg-heal-status').style.color=s.hc;
+  document.getElementById('pg-heal-pct').textContent=s.heal>0?s.heal+'%':'';
+  document.getElementById('pg-msg').innerHTML=s.msg;
+  document.getElementById('pg-dead').setAttribute('opacity',s.dead?1:0);
+  ['pg-r1','pg-r2','pg-r3'].forEach(id=>document.getElementById(id).setAttribute('opacity',s.rO));
+  var fl=document.getElementById('pg-flash');fl.setAttribute('y',clipY+22);fl.setAttribute('opacity',1);
+  setTimeout(()=>fl.setAttribute('opacity',0),700);
+  document.querySelectorAll('.pgd').forEach((d,i)=>d.classList.toggle('done',i<cuts));
+  if(cuts>=MAX)btn.disabled=true;
+}
+function pgReset(){
+  cuts=0;healTimers.forEach(clearInterval);healTimers=[];callusIds=[];
+  var s=stages[0];
+  document.getElementById('pg-clip-rect').setAttribute('y',0);document.getElementById('pg-clip-rect').setAttribute('height',290);
+  document.getElementById('pg-cutface').setAttribute('opacity',0);
+  document.getElementById('pg-co').setAttribute('fill',s.coF);document.getElementById('pg-co').setAttribute('opacity',s.coO);
+  document.getElementById('pg-ci').setAttribute('fill',s.ciF);
+  document.getElementById('pg-pval').textContent='100%';document.getElementById('pg-pval').style.color='#4A8A3E';
+  document.getElementById('pg-pbar').style.width='100%';document.getElementById('pg-pbar').style.backgroundColor='#4A8A3E';
+  document.getElementById('pg-bval').textContent='持平';document.getElementById('pg-bval').style.color='#5A9E4E';
+  document.getElementById('pg-heal-bar').style.width='0%';document.getElementById('pg-heal-bar').style.backgroundColor='#4A8A3E';
+  document.getElementById('pg-heal-status').textContent='—';document.getElementById('pg-heal-status').style.color='rgba(245,240,232,0.38)';
+  document.getElementById('pg-heal-pct').textContent='—';
+  document.getElementById('pg-dead').setAttribute('opacity',0);
+  ['pg-r1','pg-r2','pg-r3'].forEach(id=>document.getElementById(id).setAttribute('opacity',.6));
+  document.getElementById('pg-wounds').innerHTML='';document.getElementById('pg-callus').innerHTML='';
+  document.querySelectorAll('.pgd').forEach(d=>d.classList.remove('done'));
+  document.getElementById('pg-msg').innerHTML=s.msg;
+  document.getElementById('pg-knife').disabled=false;
+}
+
+/* ── SOP scroll-driven ── */
+(function(){
+  const labels=['0 — 評估','步驟一 — 清除不良枝','步驟二 — 樹冠疏剪','步驟三 — 樹冠截剪','完成 — 收整清理'];
+  let cur=-1;
+
+  function setStep(n){
+    if(n===cur)return;
+    cur=n;
+    // tree SVG swap
+    document.querySelectorAll('.sop-vsvg').forEach((s,i)=>{
+      s.classList.toggle('active',i===n);
+    });
+    // big number watermark
+    const bn=document.getElementById('sop-bignum');
+    if(bn)bn.textContent=n===4?'✓':String(n);
+    // dots
+    for(let i=0;i<5;i++){
+      const d=document.getElementById('sopd-'+i);
+      if(!d)continue;
+      d.classList.remove('on','done');
+      if(i===n)d.classList.add('on');
+      else if(i<n)d.classList.add('done');
+    }
+    // label
+    const lbl=document.getElementById('sop-sdot-label');
+    if(lbl)lbl.textContent=labels[n]||'';
+  }
+
+  const obs=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        const n=parseInt(e.target.dataset.sop);
+        if(!isNaN(n)){setStep(n);e.target.classList.add('vis');}
+      }
+    });
+  },{threshold:0.45,rootMargin:'-5% 0px -25% 0px'});
+
+  document.querySelectorAll('.sop-sc[data-sop]').forEach(c=>obs.observe(c));
+})();
+
+/* ── TIMELINE VERTICAL ── */
+(function(){
+  const nodePcts=[0,14,34,60,78,100];
+  const years=['2015','2016','2020','2024','2025','2026'];
+  let active=-1;
+
+  function setNode(n){
+    if(n===active)return;
+    active=n;
+    // fill line
+    const line=document.getElementById('tl-vline');
+    if(line)line.style.height=nodePcts[n]+'%';
+    // year watermark
+    const yr=document.getElementById('tl-year');
+    if(yr)yr.textContent=years[n];
+    // nodes
+    for(let i=0;i<=5;i++){
+      const node=document.getElementById('tlvn-'+i);
+      if(!node)continue;
+      node.classList.remove('on','done');
+      if(i===n)node.classList.add('on');
+      else if(i<n)node.classList.add('done');
+    }
+    // cards
+    document.querySelectorAll('.tl-card').forEach(c=>{
+      c.classList.toggle('on',parseInt(c.dataset.tl)===n);
+    });
+  }
+
+  // IntersectionObserver on cards
+  const obs=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        const n=parseInt(e.target.dataset.tl);
+        if(!isNaN(n))setNode(n);
+      }
+    });
+  },{threshold:0.4,rootMargin:'-10% 0px -30% 0px'});
+
+  document.querySelectorAll('.tl-card[data-tl]').forEach(c=>obs.observe(c));
+})();
+
+/* ── MOBILE PRUNING LAYOUT ── */
+(function(){
+  function adapt(){
+    const mob=window.innerWidth<520,layout=document.getElementById('pg-layout');
+    if(!layout)return;
+    const[kc,tc,ic]=[layout.children[0],layout.children[1],layout.children[2]];
+    if(mob){
+      layout.style.flexDirection='column';layout.style.alignItems='center';layout.style.gap='12px';
+      if(kc){kc.style.flexDirection='row';kc.style.paddingTop='0';kc.style.width='auto';kc.style.gap='12px';kc.style.alignItems='center'}
+      if(ic){ic.style.display='grid';ic.style.gridTemplateColumns='1fr 1fr';ic.style.width='90%';ic.style.maxWidth='320px';ic.style.paddingTop='0'}
+    }else{
+      layout.style.flexDirection='row';layout.style.alignItems='flex-start';layout.style.gap='8px';
+      if(kc){kc.style.flexDirection='column';kc.style.paddingTop='60px';kc.style.width='58px';kc.style.gap='8px';kc.style.alignItems='center'}
+      if(ic){ic.style.display='flex';ic.style.flexDirection='column';ic.style.width='148px';ic.style.paddingTop='10px'}
+    }
+  }
+  window.addEventListener('load',adapt);window.addEventListener('resize',adapt);
+})();
+
+/* ── STAT ITEMS REVEAL ── */
+const siObs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('vis')})},{threshold:.2});
+document.querySelectorAll('.stat-item').forEach(el=>siObs.observe(el));
+
+/* ── PRUNING INTRO CARDS + FADE OUT ── */
+(function(){
+  const obs=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('vis')});
+  },{threshold:.4});
+  document.querySelectorAll('[data-pruning]').forEach(c=>obs.observe(c));
+
+  // 影片淡出
+  const overlay=document.getElementById('video-fade-overlay');
+  const trigger=document.getElementById('video-fade-trigger');
+  if(overlay&&trigger){
+    const fo=new IntersectionObserver(entries=>{
+      entries.forEach(e=>{overlay.style.opacity=e.isIntersecting?'1':'0';});
+    },{threshold:0,rootMargin:'0px 0px -20% 0px'});
+    fo.observe(trigger);
+  }
+})();
+
+/* ── CHAINSAW AUDIO ── */
+(function(){
+  const hint=document.getElementById('sound-hint');
+  const icon=document.getElementById('sound-icon');
+  const txt=document.getElementById('sound-text');
+  const introText=document.getElementById('pruning-intro-text');
+  const scrollHint=document.getElementById('pruning-scroll-hint');
+  if(!hint)return;
+  let vol=0,playing=false,raf=null,muted=false;
+  function yt(){return(window.ytFieldPlayer&&window.ytFieldPlayer.setVolume)?window.ytFieldPlayer:null;}
+  function setVol(v){
+    vol=Math.max(0,Math.min(1,v));
+    const p=yt();if(p){p.setVolume(vol*100);if(vol>0)p.unMute();}
+  }
+  function fadeIn(){
+    if(raf)cancelAnimationFrame(raf);
+    const p=yt();if(!playing){if(p)p.unMute();playing=true;}
+    function step(){setVol(vol+0.015);if(vol<0.55)raf=requestAnimationFrame(step);}
+    step();
+    hint.style.opacity='1';icon.textContent='🔊';txt.textContent='鏈鋸聲音效';
+  }
+  function fadeOut(){
+    if(raf)cancelAnimationFrame(raf);
+    const p=yt();
+    function step(){setVol(vol-0.02);if(vol>0)raf=requestAnimationFrame(step);else{if(p)p.mute();playing=false;}}
+    step();
+    hint.style.opacity='0';
+  }
+  hint.style.pointerEvents='auto';hint.style.cursor='pointer';
+  hint.addEventListener('click',()=>{
+    muted=!muted;const p=yt();if(p){muted?p.mute():p.unMute();}
+    icon.textContent=muted?'🔇':'🔊';
+    txt.textContent=muted?'已靜音':'鏈鋸聲音效';
+  });
+  const sec02=document.getElementById('sec-p2-02');
+  const sec03=document.getElementById('sec-p2-03');
+  function inRange(el){
+    if(!el)return false;
+    const top=el.offsetTop;
+    const bot=top+el.offsetHeight;
+    const sy=window.scrollY;
+    const vh=window.innerHeight;
+    return sy+vh>top && sy<bot;
+  }
+  function checkSaw(){
+    const active=inRange(sec02)||inRange(sec03);
+    if(active)fadeIn();else fadeOut();
+  }
+  window.addEventListener('scroll',checkSaw,{passive:true});
+  checkSaw();
+  const photoObs=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        setTimeout(()=>{
+          if(introText){introText.style.opacity='1';introText.style.transform='translateY(0)';}
+          if(scrollHint){scrollHint.style.opacity='1';}
+        },300);
+      }
+    });
+  },{threshold:0.4});
+  const introSec=document.getElementById('sec-p2-02');
+  if(introSec)photoObs.observe(introSec);
+})();
+
+/* ── THREE-CUT scroll-driven ── */
+(function(){
+  const CUT_COLORS=['rgba(201,168,76,1)','rgba(192,100,80,1)','rgba(100,180,100,1)'];
+  const DOT_COLORS=['rgba(201,168,76,.9)','rgba(192,100,80,.9)','rgba(100,180,100,.9)'];
+  const BIGNUMS=['①','②','③'];
+  let cur=-2;
+  function setState(n){
+    if(n===cur)return;
+    cur=n;
+    [0,1,2].forEach(i=>{
+      const g=document.getElementById('tc-cut'+(i+1));
+      if(!g)return;
+      if(i<n)g.style.opacity='0.55';
+      else if(i===n)g.style.opacity='1';
+      else g.style.opacity='0.18';
+    });
+    const stub=document.getElementById('tc-stub');
+    if(stub)stub.style.opacity=n>=1?'1':'0';
+    const wound=document.getElementById('tc-wound');
+    if(wound){
+      if(n>=2){wound.style.fill='rgba(80,50,20,0.9)';wound.style.stroke='rgba(201,168,76,0.3)';}
+      else{wound.style.fill='rgba(80,50,20,0)';wound.style.stroke='rgba(201,168,76,0)';}
+    }
+    [0,1,2].forEach(i=>{
+      const d=document.getElementById('tcd-'+i);
+      if(!d)return;
+      d.classList.remove('on','done');
+      d.style.background=i===n?DOT_COLORS[i]:i<n?DOT_COLORS[i].replace('0.9','0.35'):'';
+      d.style.borderColor=i===n?DOT_COLORS[i]:i<n?DOT_COLORS[i].replace('0.9','0.3'):'';
+      if(i===n)d.classList.add('on');
+      else if(i<n)d.classList.add('done');
+    });
+    const bn=document.getElementById('tc-bignum');
+    if(bn){
+      if(n>=0&&n<=2){bn.textContent=BIGNUMS[n];bn.style.color=CUT_COLORS[n].replace('1)','0.05)');}
+      else{bn.textContent='①';bn.style.color='rgba(201,168,76,0.04)';}
+    }
+    const lbl=document.getElementById('tc-dot-lbl');
+    if(lbl){
+      const labels=['第一鋸 — 枝底切','第二鋸 — 切除枝體','第三鋸 — 枝領外緣切'];
+      lbl.textContent=n>=0?labels[n]:'延伸說明 — 三段修剪法';
+      lbl.style.color=n>=0?DOT_COLORS[n]:'var(--gold)';
+    }
+  }
+  const obs=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        const n=parseInt(e.target.dataset.tc);
+        e.target.classList.add('vis');
+        setState(isNaN(n)?-1:n);
+      }
+    });
+  },{threshold:0.5,rootMargin:'-5% 0px -25% 0px'});
+  document.querySelectorAll('.tc-sc[data-tc]').forEach(c=>obs.observe(c));
+})();
+
+/* ── P1 CLOSING 打字機 ── */
+(function(){
+  const mainEl  = document.getElementById('tw-main');
+  const subEl   = document.getElementById('tw-sub');
+  const btn     = document.getElementById('tw-btn');
+  const section = document.getElementById('sec-p1-closing');
+  if(!mainEl||!subEl||!btn||!section) return;
+
+  const audio = new Audio('打字機音效.m4a');
+  audio.loop   = true;
+  audio.volume = 0.65;
+
+  // 主標題字符序列
+  const mainChars = [];
+  '一場宛如「樹界黑死病」的疾病'.split('').forEach(c=>mainChars.push({c,gold:false}));
+  mainChars.push({c:'\n',gold:false});
+  '正在'.split('').forEach(c=>mainChars.push({c,gold:false}));
+  '無聲蔓延'.split('').forEach(c=>mainChars.push({c,gold:true}));
+
+  const subChars = '破口，從修剪那一刀開始。'.split('');
+
+  let started = false;
+
+  function startTypewriter(){
+    if(started) return;
+    started = true;
+    audio.play().catch(()=>{});
+
+    let i = 0;
+    function typeMain(){
+      if(i >= mainChars.length){ typeSub(); return; }
+      const item = mainChars[i++];
+      if(item.c === '\n'){
+        mainEl.appendChild(document.createElement('br'));
+      } else {
+        const s = document.createElement('span');
+        s.textContent = item.c;
+        if(item.gold) s.style.color = 'var(--gold)';
+        mainEl.appendChild(s);
+      }
+      setTimeout(typeMain, 80);
+    }
+
+    let j = 0;
+    function typeSub(){
+      if(j >= subChars.length){
+        audio.pause();
+        audio.currentTime = 0;
+        btn.style.opacity        = '1';
+        btn.style.pointerEvents  = 'auto';
+        btn.style.transform      = 'translateY(0)';
+        return;
+      }
+      const s = document.createElement('span');
+      s.textContent = subChars[j++];
+      subEl.appendChild(s);
+      setTimeout(typeSub, 80);
+    }
+
+    typeMain();
+  }
+
+  const obs = new IntersectionObserver(entries=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){ startTypewriter(); obs.unobserve(section); }
+    });
+  },{threshold:0.4});
+  obs.observe(section);
+})();
+</script>
+
+<!-- Flourish embed -->
+<script src="https://public.flourish.studio/resources/embed.js"></script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+[[headers]]
+  for = "/*.mp4"
+  [headers.values]
+    Content-Type = "video/mp4"
+    Cache-Control = "public, max-age=86400"
+
+[[headers]]
+  for = "/*.jpg"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
+
+[[headers]]
+  for = "/*.png"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
